@@ -1,0 +1,78 @@
+/* Loading Animation */
+.ajax-loading {
+    position: relative;
+    min-height: 100px;
+}
+.ajax-loading:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: none;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.tab-loading:after {
+    display: block;
+}
+
+/* Tabs Container */
+.your-ajax-tabs-container {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 5px;
+}
+
+.your-ajax-tabs-container li a {
+    display: flex;
+    padding: 1px 10px;
+    align-items: center;
+    text-align: center;
+    font-family: "Noto Serif TC";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 30px;
+    letter-spacing: 2.4px;
+    color: #0369F0; /* Default text color */
+    height: 32px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    background: linear-gradient(157deg, #81F9F3 -38.59%, #0369F0 115.41%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.your-ajax-tabs-container li a {
+    border-radius: 5px;
+    border: 1px solid rgba(162, 182, 242, 0.80);
+}
+
+.your-ajax-tabs-container li.active a,
+.your-ajax-tabs-container li a:hover {
+    color: #FFFFFF !important;
+    border-radius: 5px;
+    border: 1px solid rgba(162, 182, 242, 0.80);
+    background: #0369F0 !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+    background-clip: border-box !important;
+}
+
+@media (max-width: 767px) {
+    .your-ajax-tabs-container {
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}

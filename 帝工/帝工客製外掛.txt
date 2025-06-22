@@ -1,0 +1,134 @@
+<?php 
+/*
+Plugin Name: Newtide 帝公 自訂客製化功能插件
+Plugin URI: https://www.newtide.com.tw/
+Description: Newtide 帝公 自訂客製化功能插件
+Version: 1.0
+Author: CGLandmark Studio
+Author URI: https://www.cglandmark.com/
+License: All Rights Reserved
+*/
+
+function add_custom_add_to_cart_button() {
+    global $product;
+    echo '<a href="' . esc_url( $product->add_to_cart_url() ) . '" data-quantity="1" class="button product_type_simple add_to_cart_button ajax_add_to_cart" data-product_id="' . esc_attr( $product->get_id() ) . '" rel="nofollow">Add to Cart</a>';
+}
+add_action( 'woocommerce_after_shop_loop_item', 'add_custom_add_to_cart_button', 10 );
+
+
+// Enqueue the jQuery UI Datepicker script and CSS
+add_action('wp_enqueue_scripts', 'wc_enqueue_datepicker');
+function wc_enqueue_datepicker() {
+    if (is_cart() || is_checkout()) {
+        wp_enqueue_script('jquery-ui-datepicker');
+        wp_enqueue_style('jquery-ui', 'https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css');
+        wp_add_inline_script('jquery-ui-datepicker', 'jQuery(document).ready(function($){ $(".estimate-purchase-date").datepicker({dateFormat: "yy-mm-dd"}); });');
+    }
+}
+
+// Add a date picker field to each product in the cart
+// Add a select dropdown field to each product in the cart
+// Add a select dropdown field with option groups to each product in the cart
+add_action('woocommerce_after_cart_item_name', 'wc_add_estimate_purchasing_schedule_field', 10, 2);
+function wc_add_estimate_purchasing_schedule_field($cart_item, $cart_item_key) {
+    $product_id = $cart_item['product_id'];
+    $value = isset($cart_item['estimate_purchase_date']) ? $cart_item['estimate_purchase_date'] : '';
+    
+    echo '<div class="estimate-purchase-schedule">
+            <label for="estimate-purchase-date-' . $cart_item_key . '" style="height: 1px; width: 100%; display: block; overflow: hidden;">Estimate Purchasing Schedule:</label>
+            <select name="estimate_purchase_date[' . $cart_item_key . ']" id="estimate-purchase-date-' . $cart_item_key . '" class="estimate-purchase-select-field" style="width: 10em;">';
+	
+	echo '<option value="" ></option>';
+
+    // Group 1 options
+    echo '<optgroup label="__________________">';
+    echo '<option value="< 1 month" ' . selected($value, '< 1 month', false) . '>< 1 month</option>';
+    echo '<option value="2-3 months" ' . selected($value, '2-3 months', false) . '>2-3 months</option>';
+    echo '</optgroup>';
+
+    // Group 2 options
+    echo '<optgroup label="__________________">';
+    echo '<option value="< 3 months" ' . selected($value, '< 3 months', false) . '>< 3 months</option>';
+    echo '<option value="3-6 months" ' . selected($value, '3-6 months', false) . '>3-6 months</option>';
+    echo '</optgroup>';
+
+    // Group 3 options
+    echo '<optgroup label="__________________">';
+    echo '<option value="6 months" ' . selected($value, '6 months', false) . '>6 months</option>';
+    echo '</optgroup>';
+    
+    echo '</select></div>';
+}
+
+
+
+// Save the date to the cart item data
+add_filter('woocommerce_add_cart_item_data', 'wc_save_estimate_purchasing_schedule', 10, 2);
+function wc_save_estimate_purchasing_schedule($cart_item_data, $product_id) {
+    if (isset($_POST['estimate_purchase_date'])) {
+        foreach ($_POST['estimate_purchase_date'] as $cart_item_key => $date) {
+            $cart_item_data['estimate_purchase_date'] = sanitize_text_field($date);
+        }
+    }
+    return $cart_item_data;
+}
+
+// Ensure that the cart item data with date picker is carried over when cart is saved/restored
+add_filter('woocommerce_get_cart_item_from_session', 'wc_get_cart_item_estimate_purchase_date', 20, 2);
+function wc_get_cart_item_estimate_purchase_date($cart_item, $values) {
+    if (isset($values['estimate_purchase_date'])) {
+        $cart_item['estimate_purchase_date'] = $values['estimate_purchase_date'];
+    }
+    return $cart_item;
+}
+
+// Save the date as order item meta when the order is created
+add_action('woocommerce_checkout_create_order_line_item', 'wc_add_estimate_purchasing_schedule_to_order_items', 10, 4);
+function wc_add_estimate_purchasing_schedule_to_order_items($item, $cart_item_key, $values, $order) {
+    if (isset($values['estimate_purchase_date'])) {
+        $item->add_meta_data('Estimate Purchasing Schedule', $values['estimate_purchase_date'], true);
+    }
+}
+
+// Display the date on the order details page
+add_action('woocommerce_order_item_meta_end', 'wc_display_estimate_purchase_schedule_in_order', 10, 4);
+function wc_display_estimate_purchase_schedule_in_order($item_id, $item, $order, $plain_text) {
+    $estimate_purchase_date = wc_get_order_item_meta($item_id, 'Estimate Purchasing Schedule');
+    if ($estimate_purchase_date) {
+        echo '<p><strong>Estimate Purchasing Schedule:</strong> ' . esc_html($estimate_purchase_date) . '</p>';
+    }
+}
+
+// Allow admin to edit the estimate purchasing date in the order edit screen
+add_action('woocommerce_before_order_itemmeta', 'wc_add_order_editable_estimate_date', 10, 3);
+function wc_add_order_editable_estimate_date($item_id, $item, $product) {
+    $estimate_purchase_date = wc_get_order_item_meta($item_id, 'Estimate Purchasing Schedule');
+    echo '<p class="estimate_purchasing_schedule_field"><strong>Estimate Purchasing Schedule:</strong> <input type="text" name="wc_edit_estimate_purchase_date[' . $item_id . ']" class="wc-edit-estimate-purchase-date" value="' . esc_attr($estimate_purchase_date) . '" /></p>';
+}
+
+// Save admin-edited estimate purchasing date
+add_action('woocommerce_saved_order_items', 'wc_save_order_editable_estimate_date', 10, 2);
+function wc_save_order_editable_estimate_date($order_id, $items) {
+    if (isset($_POST['wc_edit_estimate_purchase_date'])) {
+        foreach ($_POST['wc_edit_estimate_purchase_date'] as $item_id => $estimate_date) {
+            wc_update_order_item_meta($item_id, 'Estimate Purchasing Schedule', sanitize_text_field($estimate_date));
+        }
+    }
+}
+
+// Enqueue the custom jQuery script to move the field
+add_action('wp_enqueue_scripts', 'wc_enqueue_custom_move_field_script');
+function wc_enqueue_custom_move_field_script() {
+    if (is_cart()) {
+        wp_add_inline_script('jquery', '
+            jQuery(document).ready(function($) {
+                $(".estimate-purchase-schedule").each(function() {
+                    // Find the closest <tr> and move the field to the third <td>
+                    var $currentRow = $(this).closest("tr");
+                    var $thirdTd = $currentRow.find("td").eq(3); // Select the third <td>
+                    $(this).appendTo($thirdTd); // Move the field to the third <td>
+                });
+            });
+        ');
+    }
+}

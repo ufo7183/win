@@ -1,0 +1,1066 @@
+<link rel="stylesheet" href="https://unpkg.com/purecss@2.1.0/build/pure-min.css">
+<link rel="stylesheet" href="<?php echo plugin_dir_url(__FILE__) ?>style.css">
+<?php
+	
+	$questionnaire = array(
+		array(
+			"title" => "Q1. 請問您的性別？ (單選)",
+			"type" => "radio",
+			"answers" => array(
+				array(
+					"text" => "男性",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "女性",
+					"image" => "",
+					"score" => 0
+				)
+			)
+		),
+		array(
+			"title" => "Q2. 您的年齡？ (單選)",
+			"type" => "radio",
+			"answers" => array(
+				array(
+					"text" => "18 ～ 24歲",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "25 ～ 29歲",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "30 ～ 34歲",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "35 ～ 39歲",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "40 ～ 44歲",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "45 ～ 49歲",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "50 ～ 54歲",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "55 ～ 59歲",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "60歲以上",
+					"image" => "",
+					"score" => 0
+				)
+			)
+		),
+		array(
+			"title" => "Q3. 您的膚色屬於哪種類型？ (單選)",
+			"type" => "radio",
+			"answers" => array(
+				array(
+					"text" => "<span class='question-image-01'><img src='".plugin_dir_url(__FILE__)."/images/skin_1_0.png' /></span><div class='q_text_01'>蒼白皮膚:對陽光高度敏感，總是曬傷，從不曬黑</div>",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "<span class='question-image-01'><img src='".plugin_dir_url(__FILE__)."/images/skin-02_0.png' /></span><div class='q_text_01'>白色皮膚:對陽光非常敏感，容易曬傷，最低限度的曬黑</div>",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "<span class='question-image-01'><img src='".plugin_dir_url(__FILE__)."/images/skin-03_0.png' /></span><div class='q_text_01'>白色到淺棕色皮膚:對陽光敏感，有時曬傷，能夠慢慢曬成淺棕色</div>",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "<span class='question-image-01'><img src='".plugin_dir_url(__FILE__)."/images/skin-04_0.png' /></span><div class='q_text_01'>中度的棕色或橄欖色皮膚:對陽光低敏感，最低限度的曬傷，總是能夠曬成中度的棕色</div>",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "<span class='question-image-01'><img src='".plugin_dir_url(__FILE__)."/images/skin-05_0.png' /></span><div class='q_text_01'>深棕色皮膚:對陽光不敏感，極少曬傷，皮膚棕色很均勻</div>",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "<span class='question-image-01'><img src='".plugin_dir_url(__FILE__)."/images/skin-06_0.png' /></span><div class='q_text_01'>黑色皮膚:對陽光不敏感，從不曬傷，皮膚深黑</div>",
+					"image" => "",
+					"score" => 0
+				)
+			)
+		),
+		array(
+			"title" => "Q4. 您正經歷哪種落髮情況？ (單選)",
+			"type" => "radio",
+			"answers" => array(
+				
+			),
+			"answers1" => array(
+				array(
+					"text" => "<span class='question-image-01'><img src='".plugin_dir_url(__FILE__)."images/man-1_0.png' /></span>落髮沿著髮際線",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "<span class='question-image-01'><img src='".plugin_dir_url(__FILE__)."images/man-2_0.png' /></span>落髮情況含髮際線及頭頂",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "<span class='question-image-01'><img src='".plugin_dir_url(__FILE__)."images/man-3_0.png' /></span>前額及兩側頭髮稀疏",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "<span class='question-image-01'><img src='".plugin_dir_url(__FILE__)."images/man-4_0.png' /></span>頭皮可見",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "其他",
+					"image" => "",
+					"score" => 0
+				)
+			),
+			"answers2" => array(
+				array(
+					"text" => "<span class='question-image-01'><img src='".plugin_dir_url(__FILE__)."images/woman-1_0.png' /></span>落髮比平時更多",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "<span class='question-image-01'><img src='".plugin_dir_url(__FILE__)."images/woman-2_0.png' /></span>髮量整體變少",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "<span class='question-image-01'><img src='".plugin_dir_url(__FILE__)."images/woman-3_0.png' /></span>頭髮分線變寬且明顯",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "<span class='question-image-01'><img src='".plugin_dir_url(__FILE__)."images/woman-4_0.png' /></span>頭皮可見",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "其他",
+					"image" => "",
+					"score" => 0
+				)
+			)
+		),
+		array(
+			"title" => "Q5. 您的落髮狀況最接近哪張圖片情況？",
+			"type" => "radio",
+			"answers" => array(
+				
+			),
+			"answers1" => array(
+				array(
+					"text" => "型態 IIa",
+					"image" => "man-type-IIa.png",
+					"score" => 100
+				),
+				array(
+					"text" => "型態 III",
+					"image" => "man-type-III.png",
+					"score" => 200
+				),
+				array(
+					"text" => "型態 IIIa",
+					"image" => "man-type-IIIa.png",
+					"score" => 200
+				),
+				array(
+					"text" => "型態 III-VERTEX",
+					"image" => "man-type-III-VERTEX.png",
+					"score" => 300
+				),
+				array(
+					"text" => "型態 IV",
+					"image" => "man-type-IV.png",
+					"score" => 300
+				),
+				array(
+					"text" => "型態 IVa",
+					"image" => "man-type-IVa.png",
+					"score" => 300
+				),
+				array(
+					"text" => "型態V",
+					"image" => "man-type-VII.png",
+					"score" => 400
+				),
+				array(
+					"text" => "型態 Va",
+					"image" => "man-type-Va.png",
+					"score" => 500
+				),
+				array(
+					"text" => "型態 VI",
+					"image" => "man-type-VI.png",
+					"score" => 500
+				),
+				array(
+					"text" => "型態 VII",
+					"image" => "man-type-V.png",
+					"score" => 500
+				),
+				array(
+					"text" => "我不清楚",
+					"image" => "",
+					"score" => 1000,
+					"hide" => true
+				)
+			),
+			"answers2" => array(
+				array(
+					"text" => "型態 I-1",
+					"image" => "woman-type-I-1.png",
+					"score" => 100
+				),
+				array(
+					"text" => "型態 I-2",
+					"image" => "woman-type-I-1-2.png",
+					"score" => 200
+				),
+				array(
+					"text" => "型態 I-3",
+					"image" => "woman-type-I-3.png",
+					"score" => 200
+				),
+				array(
+					"text" => "型態 I-4",
+					"image" => "woman-type-I-4.png",
+					"score" => 300
+				),
+				array(
+					"text" => "型態 II-1",
+					"image" => "woman-type-I-5.png",
+					"score" => 300
+				),
+				array(
+					"text" => "型態 II-2",
+					"image" => "woman-type-I-6.png",
+					"score" => 400
+				),
+				array(
+					"text" => "型態 III",
+					"image" => "woman-type-I-7.png",
+					"score" => 500
+				),
+				array(
+					"text" => "型態 ADVANCED",
+					"image" => "woman-type-advanced.png",
+					"score" => 500
+				),
+				array(
+					"text" => "型態 FRONTAL (前額區域）",
+					"image" => "woman-type-frontal.png",
+					"score" => 300
+				),
+				array(
+					"text" => "我不清楚",
+					"image" => "",
+					"score" => 1000,
+					"hide" => true
+				)
+			)
+		),
+		array(
+			"title" => "Q6. 您是否有以下情況？ (複選題)",
+			"type" => "checkbox",
+			"answers" => array(
+				array(
+					"text" => "正在服用光敏感藥物或抗癌藥物",
+					"image" => "",
+					"score" => 10000
+				),
+				array(
+					"text" => "患有光敏感症",
+					"image" => "",
+					"score" => 2000
+				),
+				array(
+					"text" => "患有或是曾患有落髮以外的頭皮疾病",
+					"image" => "",
+					"score" => 2000
+				),
+				array(
+					"text" => "患有或曾患有免疫疾病",
+					"image" => "",
+					"score" => 2000
+				),
+				array(
+					"text" => "正在治療中的頭皮傷口",
+					"image" => "",
+					"score" => 10000
+				),
+				array(
+					"text" => "孕婦",
+					"image" => "",
+					"score" => 2000
+				),
+				array(
+					"text" => "頭皮紅腫",
+					"image" => "",
+					"score" => 2000
+				),
+				array(
+					"text" => "無上述情況",
+					"image" => "",
+					"score" => 0
+				)
+			)
+		),
+		array(
+			"title" => "Q7. 您的落髮情況開始多久了？ (單選)",
+			"type" => "radio",
+			"answers" => array(
+				array(
+					"text" => "少於6個月",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "6個月至1年",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "1年至2年",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "2年以上",
+					"image" => "",
+					"score" => 0
+				)
+			)
+		), 
+		array(
+			"title" => "Q8. 您的家族成員是否有遺傳性禿髮的情況？ (單選)",
+			"type" => "radio",
+			"answers" => array(
+				array(
+					"text" => "有",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "沒有",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "不清楚",
+					"image" => "",
+					"score" => 0
+				)
+			)
+		),
+		array(
+			"title" => "Q9. 每天的落髮量大約是多少？ (單選)",
+			"type" => "radio",
+			"answers" => array(
+				array(
+					"text" => "少於50根",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "50-100根",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "100-150根",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "多於150根",
+					"image" => "",
+					"score" => 0
+				)
+			)
+		),
+		array(
+			"title" => "Q10. 您是否曾經接受過任何落髮治療？ (單選)",
+			"type" => "radio",
+			"answers" => array(
+				array(
+					"text" => "有",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "沒有",
+					"image" => "",
+					"score" => 0
+				)
+			)
+		),
+		array(
+			"title" => "Q10-1. 您嘗試過哪些產品或治療? (複選)",
+			"type" => "checkbox",
+			"answers" => array(
+				array(
+					"text" => "生髮水 Minoxidil (如: 落建)",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "生髮藥 Finasteride (如: 柔沛)",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "雷射生髮帽",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "植髮",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "PRP",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "保健食品",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "健髮洗髮精",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "頭皮養護產品",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "頭皮相關療程或課程",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "紋髮",
+					"image" => "",
+					"score" => 0
+				),
+				array(
+					"text" => "其他",
+					"image" => "",
+					"score" => 0
+				)
+			)
+		),
+		array(
+			"title" => "Q11. 您願意用於生髮治療的預算為何？ (單選)",
+			"type" => "radio",
+			"answers" => array(
+				array(
+					"text" => "低於 15,000元",
+					"image" => "",
+					"score" => 10
+				),
+				array(
+					"text" => "15,000-25,000元",
+					"image" => "",
+					"score" => 20
+				),
+				array(
+					"text" => "25,000-35,000元",
+					"image" => "",
+					"score" => 30
+				),
+				array(
+					"text" => "35,000-45,000元",
+					"image" => "",
+					"score" => 40
+				),
+				array(
+					"text" => "45,000-60,000元",
+					"image" => "",
+					"score" => 50
+				),
+				array(
+					"text" => "60,000-100,000元",
+					"image" => "",
+					"score" => 60
+				),
+				array(
+					"text" => "高於 100,000元",
+					"image" => "",
+					"score" => 70
+				)
+			)
+		)
+	);
+?>
+<div class="app_page">
+    <div class="container">
+        <!-- Questionnaire will be dynamically loaded here -->
+		
+		<form id="capillus_questionnaire" class="pure-form pure-form-stacked">
+		
+			<?php
+				$count = 0;
+				foreach ( $questionnaire as $q ) {
+					$count++;
+			?>
+						
+			<div class="q_page <?php echo 'page_'.$count; ?>">
+			
+				<h3 class="question_title"><?php echo $q['title']; ?></h3>
+				
+				
+				
+				<?php
+					if ( count($q['answers']) > 0 ) {
+				?>
+					<div class="answers_area" >
+					
+					
+					<?php
+						$count_2 = 0;
+						if ( $q['type'] == 'radio' ) {
+							
+							foreach ( $q['answers'] as $ans ) {
+								
+								$count_2++;
+								
+								$q_content = $ans['text'];
+								if ( $ans['image'] ) {
+									$q_content = '<img src="'.plugin_dir_url(__FILE__).'images/'.$ans['image'].'" />';
+								}
+								
+								$br = '';
+								
+								if ( ($count_2+1)%2 == 1 ) {
+									$br = '<br />';
+								}
+								
+								if ( $count == 3 or $count == 7 or $count == 9 or $count == 10 or $count == 11 or $count == 12 ) {
+									$br = '<br />';
+								}
+								
+								if ( $count == 5 ) {
+									$br = '';
+								}
+					?>
+
+						<label for="<?php echo 'the_form_q'.$count.'_'.$count_2; ?>" class="pure-radio answer">
+							<input type="radio" id="<?php echo 'the_form_q'.$count.'_'.$count_2; ?>" name="<?php echo 'the_form_q'.$count; ?>" value="<?php echo $ans['text']; ?>" data-score="<?php echo $ans['score']; ?>" data-title="<?php echo $q['title']; ?>" /> <?php echo $q_content; ?>
+						</label>
+						
+						<?php echo $br; ?>
+					
+					<?php 
+							}
+							
+						} elseif ( $q['type'] == 'checkbox' ) {
+							
+							foreach ( $q['answers'] as $ans ) {
+								
+								$count_2++;
+								
+								$q_content = $ans['text'];
+								if ( $ans['image'] ) {
+									$q_content = '<img src="'.plugin_dir_url(__FILE__).'images/'.$ans['image'].'" />';
+								}
+								
+								$br = '';
+								
+								if ( ($count_2+1)%2 == 1 ) {
+									$br = '<br />';
+								}
+								
+								if ( $count == 3 or $count == 6 or $count == 9 or $count == 10 or $count == 11 or $count == 12 ) {
+									$br = '<br />';
+								}
+								
+								if ( $count == 5 ) {
+									$br = '';
+								}
+								
+					?>
+					
+						<label for="<?php echo 'the_form_q'.$count.'_'.$count_2; ?>" class="pure-checkbox answer">
+							<input type="checkbox" id="<?php echo 'the_form_q'.$count.'_'.$count_2; ?>" name="<?php echo 'the_form_q'.$count; ?>[]" value="<?php echo $ans['text']; ?>" data-score="<?php echo $ans['score']; ?>" data-title="<?php echo $q['title']; ?>" /> <?php echo $q_content; ?>
+						</label>
+						
+						<?php echo $br; ?>
+				
+				<?php
+							}
+						}
+				?>
+					</div>
+				<?php
+					}
+				?>
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				<?php
+					if ( isset($q['answers1']) and isset($q['answers2']) and ( count($q['answers1']) > 0 or count($q['answers2']) > 0 ) ) {
+				?>
+					<div class="answers_area man" >
+					
+					<?php
+						$count_2 = 0;
+						if ( $q['type'] == 'radio' ) {
+							
+							foreach ( $q['answers1'] as $ans ) {
+								
+								$count_2++;
+								
+								$q_content = $ans['text'];
+								if ( $ans['image'] ) {
+									$q_content = '<img src="'.plugin_dir_url(__FILE__).'images/'.$ans['image'].'" />';
+								}
+								
+								$br = '';
+								
+								if ( ($count_2+1)%2 == 1 ) {
+									$br = '<br />';
+								}
+								
+								if ( $count == 3 or $count == 7 or $count == 9 or $count == 10 or $count == 11 or $count == 12 ) {
+									$br = '<br />';
+								}
+								
+								if ( $count == 5 ) {
+									$br = '';
+								}
+								
+								$hide = '';
+								
+								if ( isset($ans['hide']) and $ans['hide'] ) {
+									$hide = 'display:none;';
+								}
+					?>
+
+						<label style="<?php echo $hide ; ?>" for="<?php echo 'the_form_q'.$count.'_'.$count_2; ?>m" class="pure-radio answer">
+							<input type="radio" id="<?php echo 'the_form_q'.$count.'_'.$count_2; ?>m" name="<?php echo 'the_form_q'.$count; ?>m" value="<?php echo $ans['text']; ?>" data-score="<?php echo $ans['score']; ?>" data-title="<?php echo $q['title']; ?>" /> <?php echo $q_content; ?>
+							<span class="caption"><?php echo $ans['text']; ?></span>
+						</label>
+						
+						
+						<?php echo $br; ?>
+					
+					<?php 
+							}
+							
+						}
+						
+					?>
+					
+					<div class="q-button" class="i-dont-know" style="text-align: center; "  >我不清楚</div>
+						
+					</div>
+					
+					
+					<div class="answers_area woman" >
+					
+					<?php
+						$count_2 = 0;
+						if ( $q['type'] == 'radio' ) {
+							
+							foreach ( $q['answers2'] as $ans ) {
+								
+								$count_2++;
+								
+								$q_content = $ans['text'];
+								if ( $ans['image'] ) {
+									$q_content = '<img src="'.plugin_dir_url(__FILE__).'images/'.$ans['image'].'" />';
+								}
+								
+								$br = '';
+								
+								if ( ($count_2+1)%2 == 1 ) {
+									$br = '<br />';
+								}
+								
+								if ( $count == 3 or $count == 7 or $count == 9 or $count == 10 or $count == 11 or $count == 12 ) {
+									$br = '<br />';
+								}
+								
+								if ( $count == 5 ) {
+									$br = '';
+								}
+								
+								$hide = '';
+								
+								if ( isset($ans['hide']) and $ans['hide'] ) {
+									$hide = 'display:none;';
+								}
+								
+					?>
+
+						<label style="<?php echo $hide ; ?>" for="<?php echo 'the_form_q'.$count.'_'.$count_2; ?>w" class="pure-radio answer">
+							<input type="radio" id="<?php echo 'the_form_q'.$count.'_'.$count_2; ?>w" name="<?php echo 'the_form_q'.$count; ?>w" value="<?php echo $ans['text']; ?>" data-score="<?php echo $ans['score']; ?>" data-title="<?php echo $q['title']; ?>" /> <?php echo $q_content; ?>
+							<span class="caption"><?php echo $ans['text']; ?></span>
+						</label>
+						
+						
+						<?php echo $br; ?>
+					
+					<?php 
+							}
+							
+						}
+						
+					?>
+					
+					<div class="q-button" class="i-dont-know" style="text-align: center; "  >我不清楚</div>
+						
+					</div>
+					
+				<?php
+					}
+				?>
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			<?php
+				}
+			?>
+			
+			<div class="q_page">
+				
+				<h3 class="question_title">填寫您的 E-mail，立即取得檢測結果</h3>
+				
+				<div class="email_input">
+					<input style="display: inline;" id="q_email" type="email" placeholder="請填寫您的E-mail" required="" />
+				</div>
+				
+				<button type="submit" class="q_form_submit">送出</button>
+			  
+			</div>
+
+		</form>
+		
+		<div class="navigation">
+			<button id="prevQuestion" class="navigation-button">上一題</button>
+			<button id="nextQuestion" class="navigation-button">下一題</button>
+		</div>
+		
+		
+		
+    </div>
+</div>
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+jQuery(document).ready(function($) {
+   
+    let q_page_index = 0;
+    const q_page_max = $('.q_page').length;
+	
+	let answers = [];
+	
+	$('#capillus_questionnaire').addClass('man')
+   
+    $('.q_page').hide();
+   
+    $('.q_page:eq(0)').show();
+   
+    if ( q_page_index == 0 ) {
+	  $('#prevQuestion').hide();
+    } else {
+	  $('#prevQuestion').show();
+    }
+   
+    $('#prevQuestion').click(function(e){
+	   
+	   if ( q_page_index > 0 ) {
+		   
+		   q_page_index = q_page_index - 1;
+		   
+		   if ( q_page_index == 10 ) {
+			   
+			   if ( $('#the_form_q10_1').prop('checked') ) {
+			     
+			   } else {
+				 q_page_index = q_page_index - 1;
+			   }
+		   }
+		   
+		   $('.q_page').hide();
+		   $('.q_page:eq('+q_page_index+')').fadeIn();
+		   
+	   }
+	   
+	   if ( q_page_index == 0 ) {
+		   $('#prevQuestion').hide();
+	   } else {
+		   $('#prevQuestion').show();
+	   }
+	   
+    });
+   
+    $('#nextQuestion').click(function(e){
+	   
+	   let answered_flag = 0;
+	   
+	   $('.q_page:eq('+q_page_index+')').find('input').each(function(){
+		   if ( $(this).prop('checked') ) {
+			   answered_flag++;
+		   }
+	   });
+	   
+	   if ( !answered_flag ) {
+		   alert('本頁尚未作答!');
+		   return false;
+	   }
+	   
+	   if ( q_page_index < q_page_max - 1 ) {
+		   
+		   q_page_index = q_page_index + 1;
+		   
+		   if ( q_page_index == 10 ) {
+			   
+			   if ( $('#the_form_q10_1').prop('checked') ) {
+			     
+			   } else {
+				 q_page_index = q_page_index + 1;
+			   }
+		   }
+		   
+		   $('.q_page').hide();
+		   $('.q_page:eq('+q_page_index+')').fadeIn();
+		   
+		} 
+	   
+	   if ( q_page_index == 0 ) {
+		   $('#prevQuestion').hide();
+	   } else {
+		   $('#prevQuestion').show();
+	   }
+	   
+	   if ( q_page_index == ( q_page_max - 1 ) ) {
+		   $('#prevQuestion').hide();
+		   $('#nextQuestion').hide();
+	   }
+	   
+    });
+   
+	$('#capillus_questionnaire input').click(function(e){
+		console.log($(this).val());
+		let value = $(this).val();
+		if ( value == '男' || value == '男性' ) {
+			$('#capillus_questionnaire').addClass('man').removeClass('woman');
+		}
+		if ( value == '女' || value == '女性' ) {
+			$('#capillus_questionnaire').addClass('woman').removeClass('man');
+		}
+	});
+	
+	$('.answers_area.man label, .answers_area.woman label').click(function(e){
+		$(this).addClass('active').siblings().removeClass('active');
+		$('.answers_area .q-button').removeClass('active');
+		$('#the_form_q5_11m').prop('checked', false);
+		$('#the_form_q5_10w').prop('checked', false);
+	});
+	
+	$('.answers_area .q-button').click(function(e){
+		$('.answers_area.man label, .answers_area.woman label').removeClass('active');
+		$('.answers_area .q-button').addClass('active');
+		if ( $('#capillus_questionnaire').hasClass('man') ) {
+			$('#the_form_q5_11m').prop('checked', true);
+		}
+		if ( $('#capillus_questionnaire').hasClass('woman') ) {
+			$('#the_form_q5_10w').prop('checked', true);
+		}
+	});
+	
+	$('#capillus_questionnaire').submit(function(e){
+		
+		e.preventDefault();
+		
+		let total_score = 0;
+		
+		let answers = [];
+		
+		$('.q_page').find('input').each(function(){
+		   if ( $(this).prop('checked') ) {
+			   //answered_flag++;
+			   console.log('--');
+			   console.log($(this).prop('name'));			   
+			   console.log($(this).data('title'));
+			   console.log($(this).val());
+			   console.log($(this).data('score'));
+			   console.log('---');
+			   
+			   let question_answered = {};
+			   question_answered.name = $(this).prop('name');
+			   question_answered.title = $(this).prop('title');
+			   question_answered.value = $(this).val();
+			   question_answered.score = $(this).data('score');
+			   
+			   answers.push(question_answered);
+			   
+			   total_score = total_score + $(this).data('score');
+		   }
+	   });
+
+	   let result_text = "";
+	   let redirect = "";
+		
+	   if ( total_score >= 100 && total_score <= 199 ) {
+		   // 分數區間: 100-199
+		   result_text = "結果1-測驗結果-輕度落髮";
+		   redirect = "/result-mild/";
+	   }
+	
+	   /*
+	   if ( total_score >= 200 && total_score <= 299 ) {
+		   // 分數區間: 200-299
+		   result_text = "結果2-測驗結果-輕/中度落髮";
+		   redirect = "/result-mild-moderate/";
+	   }
+	   */
+	   
+	   if ( total_score >= 300 && total_score <= 399 ) {
+		   // 分數區間: 300-399
+		   result_text = "結果3-測驗結果-中度落髮";
+		   redirect = "/result-moderate/";
+	   }
+		
+	   if ( total_score >= 400 && total_score <= 499 ) {
+		   // 分數區間: 400-499
+		   result_text = "結果4-測驗結果-中/重度落髮";
+		   redirect = "/result-moderate-severe/";
+	   }
+	   
+	   if ( total_score >= 500 && total_score <= 999 ) {
+		   // 分數區間: 500-999
+		   result_text = "結果5-測驗結果-嚴重";
+		   redirect = "/result-advanced/";
+	   }
+	   
+	   if ( total_score >= 1000 && total_score <= 1999 ) {
+		   // 分數區間: 1000-1999
+		   result_text = "結果6-測驗結果-不清楚";
+		   redirect = "/result-undetermined/";
+	   }
+	   
+	   if ( total_score >= 2000 && total_score <= 9999 ) {
+		   // 分數區間: 2000-9999
+		   result_text = "結果7-測驗結果-其他";
+		   redirect = "/result-others/";
+	   }
+	   
+	   if ( total_score >= 10000 ) {
+		   // 分數區間: 10000以上
+		   result_text = "結果8-測驗結果-不合適";
+		   redirect = "/result-not-applicable/";
+	   }
+	   
+	   console.log(result_text);
+	   
+	   //alert('系統更新中，請稍後再測試！');
+	   //return false;
+	   
+	   let user_email = $('#q_email').val();
+	   
+	   $.ajax({
+            url: '<?php echo admin_url('admin-ajax.php'); ?>', // WordPress AJAX handler URL
+            type: 'POST',
+            data: {
+                action: 'send_result_email', // the PHP function to hook into
+                email: user_email,
+                result: result_text, 
+				answers: answers,
+            },
+            success: function(response) {
+				console.log(answers);
+                console.log('Email sent: ' + response);
+				//alert('測驗結果已成功寄到您的信箱！(若未收到，請檢查垃圾信件匣)');
+				if ( redirect ) {
+					window.location.href = redirect;
+				} else {
+					alert(result_text);
+				}
+            }
+        });
+	   
+	   return false;
+	   
+	});
+
+});
+	
+jQuery(document).ready(function($) {
+    
+	// Handle radio button change
+    $('.answers_area input[type="radio"]').on('change', function() {
+        //$('.answers_area label.pure-radio.answer').removeClass('checked');
+        $(this).parent().parent().find('label.pure-radio.answer').removeClass('checked');
+        if ($(this).is(':checked')) {
+            $(this).closest('label').addClass('checked');
+        } else {
+			
+		}
+    });
+
+    // Handle checkbox change
+    $('.answers_area input[type="checkbox"]').on('change', function() {
+        if ($(this).is(':checked')) {
+            $(this).closest('label').addClass('checked');
+        } else {
+            $(this).closest('label').removeClass('checked');
+        }
+    }); 
+	
+});
+
+</script>

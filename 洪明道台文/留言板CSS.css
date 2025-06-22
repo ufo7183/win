@@ -1,0 +1,688 @@
+/* 基礎容器 */
+.angminde-message-board-container {
+    width: 960px
+    max-width: 100%;
+    margin: 0 auto;
+    font-family: 'Noto Serif', serif;
+    color: #222220;
+    line-height: 1.6;
+}
+
+/* 輸入框容器 */
+.angminde-input-container {
+    width: 100%;
+    margin: 0 auto 50px;
+    padding: 0;
+}
+
+.angminde-input-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 88px;
+    padding: 20px;
+    background: #FFFFFF;
+    border-radius: 20px;
+    box-shadow: none;
+    transition: all 0.3s ease;
+    margin: 0 auto;
+}
+
+.angminde-input-box:hover {
+    box-shadow: none;
+}
+
+.angminde-input-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.angminde-placeholder {
+    flex: 1;
+    font-size: 16px;
+    color: #ACACAC;
+    letter-spacing: 0.2em;
+}
+
+.angminde-login-btn {
+    padding: 9px 26px;
+    background: #222220;
+    color: #FFFFFF;
+    border-radius: 10px;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.angminde-login-btn:hover {
+    background: #333;
+}
+
+/* 真正的輸入表單 */
+.angminde-input-form .angminde-input-box {
+    gap: 20px;
+}
+
+.angminde-message-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #222220;
+    background: transparent;
+    resize: none;
+    min-height: 24px;
+    max-height: 120px;
+    font-family: inherit;
+}
+
+.angminde-message-input::placeholder {
+    color: #ACACAC;
+}
+
+.angminde-submit-btn {
+    padding: 12px 24px;
+    background: #222220;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.angminde-submit-btn:hover:not(:disabled) {
+    background: #333;
+}
+
+.angminde-submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* 留言列表容器 */
+.angminde-messages-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-width: 960px; /* 兩個卡片 + 間距 */
+    margin: 0 auto;
+    gap: 60px; /* 卡片間距 */
+}
+
+.angminde-message-item {
+    width: 450px; /* 固定寬度 */
+    margin: 0; 
+    padding: 0;
+    border-radius: 20px;
+    box-sizing: border-box;
+    background: transparent; /* 移除背景色 */
+    transition: all 0.3s ease;
+}
+
+.angminde-message-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 留言主體背景色 */
+.angminde-message-main {
+    position: relative;
+    background: #D9D9D9;
+    border-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    transition: all 0.3s ease;
+    padding: 20px;
+    cursor: pointer;
+}
+
+.angminde-message-main:hover {
+    transform: translateY(-2px);
+    box-shadow: none;
+}
+
+/* 用戶資訊區塊 */
+.angminde-user-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* 用戶資訊區塊 */
+.angminde-user-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+/* 用戶頭像和名稱 */
+.angminde-avatar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.angminde-avatar img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.angminde-username {
+    font-size: 16px;
+    color: #222220;
+    letter-spacing: 0.2em;
+}
+
+.angminde-username:hover {
+    text-decoration: underline;
+}
+
+.angminde-username.admin {
+    pointer-events: none;
+    cursor: default;
+}
+
+
+/* 按鈕區域 */
+.angminde-actions {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.angminde-like-btn, .angminde-reply-count {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.angminde-like-btn:not(.disabled):hover,
+.angminde-reply-count:hover {
+    transform: scale(1.1);
+}
+
+.angminde-like-btn.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.angminde-like-btn img,
+.angminde-reply-count img {
+    width: 20px;
+    height: 20px;
+}
+
+.angminde-like-btn .like-count,
+.angminde-reply-count span {
+    font-size: 12px;
+    color: #222220;
+    letter-spacing: 0.2em;
+}
+
+.angminde-like-btn.liked {
+    color: #e74c3c;
+}
+
+/* 留言內容 */
+.angminde-message-content {
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 15px 20px;
+    margin: 10px 0;
+    font-size: 12px;
+    line-height: 1.67;
+    letter-spacing: 0.2em;
+    color: #222220;
+}
+
+.angminde-message-content p {
+    font-size: 12px;
+    line-height: 1.67;
+    letter-spacing: 0.2em;
+    margin: 0;
+    word-wrap: break-word;
+}
+
+
+/* 回覆區域背景色 */
+.angminde-replies {
+    width: 100%;
+    background: #D9D9D9;  /* 確保回覆區域背景色 */
+    padding: 0 15px 15px 15px;
+    border-radius: 0 0 20px 20px;  /* 底部圓角 */
+    margin-top: -20px; /* 與主留言重疊 */
+    display: none;
+    position: relative;
+    z-index: 1;
+    padding-top: 30px; /* 補償重疊部分 */
+}
+
+.angminde-reply-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    background: #fff;
+    border-radius: 20px;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.angminde-reply-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.angminde-reply-content {
+    flex: 1;
+}
+
+.angminde-reply-content p {
+    font-size: 12px;
+    line-height: 1.67;
+    letter-spacing: 0.2em;
+    margin: 0;
+    
+}
+
+/* 回覆表單 */
+.angminde-reply-form {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: #fff;
+    border-top: 1px solid #eee;
+    flex-shrink: 0;
+}
+
+.angminde-reply-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover;
+}
+
+.angminde-reply-input {
+    flex: 1;
+    height: 40px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 0 15px;
+    margin-right: 10px;
+    font-family: inherit;
+    resize: none;
+    line-height: 40px;
+    overflow: hidden;
+}
+
+.angminde-reply-submit {
+    background: none;
+    border: none;
+    width: 24px;
+    height: 24px;
+    background-image: url('https://angminde.tw/wp-content/uploads/2025/05/Vector-1.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    text-indent: -9999px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.angminde-reply-submit:hover:not(:disabled) {
+    background: #333;
+}
+
+/* 頭像上傳區塊 */
+.angminde-avatar-upload {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 10px;
+}
+
+.angminde-avatar-upload h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #222220;
+}
+
+#upload-avatar-btn {
+    padding: 10px 20px;
+    background: #222220;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+#upload-avatar-btn:hover {
+    background: #333;
+}
+
+#avatar-preview {
+    margin-top: 15px;
+}
+
+/* 響應式設計 - 平板 (500px - 1023px) */
+@media (max-width: 1023px) and (min-width: 500px) {
+    .angminde-messages-container {
+        max-width: 450px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+    
+    .angminde-messages-container {
+        width: 100%;
+        max-width: 100%;
+        justify-content: center;
+    }
+    
+    .angminde-message-item {
+        width: 100%;
+        max-width: 450px;
+    }
+    
+    .angminde-input-container {
+        max-width: 100%;
+        padding: 0 20px;
+    }
+    
+    .angminde-input-box {
+        padding: 15.78px 20px;
+    }
+    
+    .angminde-message-main {
+        padding: 15.78px 20px;
+    }
+    
+    .angminde-reply-item {
+        margin-left: 0;
+    padding-left: 0;
+    border-left: none;
+    }
+    
+    .angminde-placeholder {
+        font-size: 15.04px;
+    }
+    
+    .angminde-username {
+        font-size: 15.04px;
+    }
+    
+    .angminde-message-content p,
+    .angminde-reply-content p {
+        font-size: 10.32px;
+        line-height: 1.59;
+    }
+    
+    .angminde-like-btn .like-count,
+    .angminde-reply-count span {
+        font-size: 10.32px;
+    }
+    
+    .angminde-like-btn img,
+    .angminde-reply-count img {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+/* 響應式設計 - 手機 (最大499px) */
+@media (max-width: 499px) {
+    .angminde-messages-container {
+        max-width: 100%;
+        padding: 0 10px;
+    }
+    
+    .angminde-message-item {
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+    }
+    
+    .angminde-input-container {
+        max-width: 100%;
+        margin: 0 auto 30px;
+        padding: 0 10px;
+        width: 100%;
+    }
+    
+    .angminde-input-box {
+        min-height: 88px;
+    }
+    
+    .angminde-message-main {
+        padding: 12.64px 20px;
+    }
+    
+    .angminde-reply-item {
+        padding: 12.64px 20px;
+    }
+    
+    .angminde-user-details {
+        gap: 0;
+    }
+    
+    .angminde-actions {
+        flex-wrap: nowrap;
+        gap: 0;
+    }
+    
+    .angminde-placeholder {
+        font-size: 14.08px;
+    }
+    
+    .angminde-username {
+        font-size: 14.08px;
+        line-height: 1.2;
+    }
+
+   
+    
+    .angminde-message-content p,
+    .angminde-reply-content p {
+        font-size: 12px;
+        line-height: 1.47;
+    }
+    
+    .angminde-like-btn .like-count,
+    .angminde-reply-count span {
+        font-size: 12px;
+        line-height: 1.47;
+    }
+}
+
+/* 電腦版特殊設定 - 1024px以上 */
+/* 小螢幕適配 */
+@media (max-width: 400px) {
+    .angminde-messages-container {
+        padding: 0 10px;
+    }
+    
+    .angminde-message-item {
+        width: 100% !important;
+    }
+    
+    .angminde-input-container {
+        max-width: 100%;
+    }
+}
+
+/* 展開時的圓角處理 */
+.angminde-message-item.expanded .angminde-message-main {
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+
+.angminde-message-item.expanded {
+    position: relative;
+    z-index: 2;
+    margin-bottom: 0;
+}
+
+/* 當有回覆表單時，移除回覆區域的底部圓角 */
+.angminde-message-item.expanded .angminde-replies:has(+ .angminde-reply-form),
+.angminde-message-item.expanded .angminde-reply-form:has(+ .angminde-replies) + .angminde-replies {
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+
+@media (min-width: 1024px) {
+    /* 只顯示50%寬度 */
+    .angminde-messages-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        max-width: 960px; /* 兩個卡片 + 間距 */
+        margin: 0 auto;
+        gap: 60px; /* 卡片間距 */
+    }
+
+    .angminde-message-item {
+        width: 450px; /* 固定寬度 */
+        margin: 0; /* 移除默認 margin */
+    }
+
+    /* 確保回覆區域不會影響佈局 */
+    .angminde-message-item .angminde-replies {
+        width: 100%;
+    }
+
+
+
+}
+
+/* 動畫效果 */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.angminde-message-item.visible {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+/* 載入狀態 */
+.angminde-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+.angminde-loading::after {
+    content: '';
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #222220;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 平滑滾動 */
+html {
+    scroll-behavior: smooth;
+}
+
+/* 選中狀態 */
+::selection {
+    background: #222220;
+    color: #FFFFFF;
+}
+
+/* 焦點狀態 */
+.angminde-message-input:focus,
+.angminde-reply-input:focus {
+    outline: 2px solid #222220;
+    outline-offset: 2px;
+}
+
+/* 可訪問性改進 */
+.angminde-like-btn:focus,
+.angminde-reply-count:focus,
+.angminde-submit-btn:focus,
+.angminde-reply-submit:focus {
+    outline: 2px solid #222220;
+    outline-offset: 2px;
+}
+
+/* 錯誤狀態 */
+.angminde-error {
+    color: #e74c3c;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* 成功狀態 */
+.angminde-success {
+    color: #27ae60;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* 隱藏狀態 */
+.angminde-hidden {
+    display: none;
+}
+
+/* 展開狀態指示器 */
+.angminde-message-item.expanded .angminde-message-main::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #D9D9D9;
+}
+
+.angminde-message-item.expanded {
+    z-index: 2; /* 確保展開時在上層 */
+}
+
+.angminde-message-item.expanded .angminde-message-main {
+    background: #D9D9D9;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    position: relative;
+    z-index: 2;
+    border-bottom: none;
+}
+
+.angminde-message-item.expanded .angminde-replies {
+    display: block;
+    background: #D9D9D9;
+    position: relative;
+    z-index: 1;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+}

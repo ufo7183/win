@@ -1,0 +1,100 @@
+ /* CSS */
+        .dropdown {
+            /* 1. 置中定位 */
+            position: absolute;
+            top: 5%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2000; /* 確保在最上層 */
+            background: linear-gradient(to right, 
+        transparent 0%,             /* 左側邊緣：完全透明 */
+        rgba(0, 0, 0, 0.1) 30%,     /* 在畫面寬度 30% 的位置，平滑過渡到 30% 透明度的黑色 */
+        rgba(0, 0, 0, 0.1) 70%,     /* 從 30% 到 70% 的區間，都是 30% 透明度的黑色實心色塊 */
+        transparent 100%            /* 從 70% 開始向右，平滑過渡到完全透明 */
+    );
+            /* 2. 仿圖的漸層背景 */
+           /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */ /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+            
+            /* 3. 仿圖的文字與陰影 */
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            /* 關鍵：文字陰影 (水平偏移0, 垂直偏移1px, 模糊2px, 顏色為半透明黑) */
+            text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.7);
+
+            /* 4. 其他外觀設定 */
+            display: flex; /* 使用 Flexbox 來對齊內部項目 */
+            align-items: center; /* 垂直居中對齊 */
+            padding: 10px 35px;
+            border-radius: 4px;
+            border: none;
+            
+            cursor: pointer;
+            white-space: nowrap; /* 防止文字換行 */
+            transition: all 0.2s ease; /* 加入平滑過渡效果 */
+        }
+        
+        .dropdown:hover {
+            
+            transform: translate(-50%, -50%) scale(1.02); /* 滑鼠懸浮時輕微放大 */
+        }
+
+        .arrow {
+            display: inline-block;
+            transform: rotate(0deg);
+            transition: transform 0.3s ease;
+            margin-right: 10px; /* 箭頭與文字的間距 */
+        }
+        
+        .dropdown-content {
+            display: none; /* 預設隱藏 */
+            position: absolute;
+            top: calc(100% + 5px); /* 顯示在主按鈕下方 5px 處 */
+            left: 0;
+            min-width: 100%;
+            background: linear-gradient(to right, 
+        transparent 0%,             /* 左側邊緣：完全透明 */
+        rgba(0, 0, 0, 0.1) 30%,     /* 在畫面寬度 30% 的位置，平滑過渡到 30% 透明度的黑色 */
+        rgba(0, 0, 0, 0.1) 70%,     /* 從 30% 到 70% 的區間，都是 30% 透明度的黑色實心色塊 */
+        transparent 100%            /* 從 70% 開始向右，平滑過渡到完全透明 */
+    );
+            
+            
+            border: none;
+            overflow: hidden; /* 確保內容不會超出圓角 */
+            padding: 0;
+        }
+
+        .dropdown-content a {
+            display: block;
+            padding: 10px 20px;
+            color: #f0f0f0; /* 選項文字顏色 */
+            text-decoration: none;
+            text-align: center;
+            text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5); /* 選項也加上細微陰影 */
+        }
+
+        .dropdown-content a:hover {
+            background: radial-gradient(ellipse at center, rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+            color: white;
+        }
+        
+        /* 手機版樣式 */
+        @media screen and (max-width: 768px) {
+            .dropdown {
+                left: 10px;  /* 靠左對齊 */
+                transform: translateY(-50%);  /* 只保留垂直置中 */
+                width: auto;
+                padding: 10px 15px;
+                white-space: nowrap;
+                max-width: 90%;  /* 避免太寬 */
+            }
+            
+            .dropdown:hover {
+                transform: translateY(-50%) scale(1.02);  /* 調整懸停效果 */
+            }
+            
+            .dropdown-content {
+                left: 0;
+                
+        }
