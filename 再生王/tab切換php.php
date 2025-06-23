@@ -6,6 +6,8 @@ function your_ajax_tabs_shortcode_function($atts) {
         'taxonomy'  => 'teams-category',
         'query_id'  => '',
     ), $atts, 'your_ajax_tabs');
+    
+    // 移除所有登入相關的檢查
 
     $terms = get_terms(array(
         'taxonomy'   => $atts['taxonomy'],
@@ -34,6 +36,12 @@ function your_ajax_tabs_session_start() {
     if (session_status() == PHP_SESSION_NONE) {
         session_start();
     }
+    
+    // Reset tab state on logout
+    if (isset($_GET['loggedout']) && $_GET['loggedout'] === 'true') {
+        unset($_SESSION['yat_current_term_id']);
+        unset($_SESSION['yat_current_taxonomy']);
+    }
 }
 
 
@@ -41,49 +49,83 @@ function your_ajax_tabs_session_start() {
 add_action('wp_ajax_your_filter_action', 'your_ajax_tabs_filter_handler');
 add_action('wp_ajax_nopriv_your_filter_action', 'your_ajax_tabs_filter_handler');
 function your_ajax_tabs_filter_handler() {
-    check_ajax_referer('your_ajax_nonce', 'nonce');
+    // 檢查 nonce
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'your_ajax_nonce')) {
+        wp_send_json_error('Invalid nonce');
+    }
 
     $term_id = isset($_POST['term_id']) ? sanitize_text_field($_POST['term_id']) : 'all';
-    $taxonomy = isset($_POST['taxonomy']) ? sanitize_text_field($_POST['taxonomy']) : 'category';
+    $taxonomy = isset($_POST['taxonomy']) ? sanitize_text_field($_POST['taxonomy']) : 'teams-category';
+    $query_id = isset($_POST['query_id']) ? sanitize_text_field($_POST['query_id']) : '';
 
-    $_SESSION['yat_current_term_id'] = $term_id;
-    $_SESSION['yat_current_taxonomy'] = $taxonomy;
+    // 直接返回篩選後的內容
+    ob_start();
     
-    // 除錯完畢後，可以移除下方的 debug_data 和括號中的內容
-    $debug_data = array(
-        'message' => 'Session updated successfully',
-        'session_term_id' => $_SESSION['yat_current_term_id'],
-        'session_taxonomy' => $_SESSION['yat_current_taxonomy']
+    $args = array(
+        'post_type'      => 'teams',
+        'posts_per_page' => 12,
+        'post_status'    => 'publish',
     );
-    wp_send_json_success($debug_data);
+
+    // 如果不是全部，添加分類篩選
+    if ($term_id !== 'all') {
+        $args['tax_query'] = array(
+            array(
+                'taxonomy' => $taxonomy,
+                'field'    => 'term_id',
+                'terms'    => $term_id,
+            ),
+        );
+    }
+
+    $query = new WP_Query($args);
+
+    if ($query->have_posts()) {
+        while ($query->have_posts()) {
+            $query->the_post();
+            // 這裡使用你的文章模板部分
+            ?>
+            <div class="team-item">
+                <h3><?php the_title(); ?></h3>
+                <div class="team-content">
+                    <?php the_content(); ?>
+                </div>
+            </div>
+            <?php
+        }
+        wp_reset_postdata();
+    } else {
+        echo '<p>沒有找到相關文章</p>';
+    }
+
+    $html = ob_get_clean();
+    
+    wp_send_json_success(array(
+        'html' => $html,
+        'message' => '篩選成功',
+        'term_id' => $term_id,
+        'found_posts' => $query->found_posts
+    ));
 }
 
 
-// ========== 功能四：掛載到 Elementor Query Hook (最關鍵！) ==========
+// ========== 功能四：掛載到 Elementor Query Hook ==========
 add_action('elementor/query/my-first-loop', function($query) {
-    // 強制設置每頁顯示12個項目
+    // 設置每頁顯示12個項目
     $query->set('posts_per_page', 12);
     $query->set('nopaging', false);
     
-    // 添加除錯日誌
-    $debug_message = 'Elementor Query Hook Triggered - ';
-    $debug_message .= 'Current Term ID: ' . (isset($_SESSION['yat_current_term_id']) ? $_SESSION['yat_current_term_id'] : 'not set') . ', ';
-    $debug_message .= 'Current Taxonomy: ' . (isset($_SESSION['yat_current_taxonomy']) ? $_SESSION['yat_current_taxonomy'] : 'not set') . ', ';
-    $debug_message .= 'Posts Per Page: ' . $query->get('posts_per_page');
+    // 檢查 URL 中的 category 參數
+    $category = isset($_GET['category']) ? sanitize_text_field($_GET['category']) : '';
     
-    // 記錄到WordPress除錯日誌
-    error_log($debug_message);
-    
-    if (isset($_SESSION['yat_current_term_id']) && $_SESSION['yat_current_term_id'] !== 'all') {
-        $tax_query = $query->get('tax_query');
-        if (!is_array($tax_query)) {
-            $tax_query = array();
-        }
-        $tax_query[] = array(
-            'taxonomy' => $_SESSION['yat_current_taxonomy'],
-            'field'    => 'term_id',
-            'terms'    => $_SESSION['yat_current_term_id'],
-            'operator' => 'IN'
+    if (!empty($category) && $category !== 'all') {
+        $tax_query = array(
+            array(
+                'taxonomy' => 'teams-category',
+                'field'    => 'term_id',
+                'terms'    => $category,
+                'operator' => 'IN'
+            )
         );
         $query->set('tax_query', $tax_query);
     }

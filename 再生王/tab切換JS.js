@@ -1,16 +1,52 @@
 // 使用 jQuery 的 document.ready() 來確保所有 HTML 元素都已經載入完成，才執行我們的程式碼。
 jQuery(document).ready(function($) {
+    var urlParams = new URLSearchParams(window.location.search);
+    // 清除登出相關的 URL 參數
+    if (urlParams.has('loggedout')) {
+        var newUrl = window.location.pathname;
+        if (urlParams.has('category')) {
+            newUrl += '?category=' + urlParams.get('category');
+        }
+        window.history.replaceState({}, document.title, newUrl);
+    }
+    
+    // 頁面載入時檢查 URL 參數並設置對應的標籤
+    var categoryParam = urlParams.get('category');
+    if (categoryParam) {
+        var $targetTab = $('.your-ajax-tabs-container a[data-term-id="' + categoryParam + '"]');
+        if ($targetTab.length) {
+            $targetTab.parent('li').addClass('active').siblings().removeClass('active');
+            if (typeof sessionStorage !== 'undefined') {
+                sessionStorage.setItem('current_tab_term_id', categoryParam);
+            }
+        }
+    } else if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('current_tab_term_id')) {
+        // 如果 URL 沒有 category 參數，但有保存的 tab 狀態，則恢復
+        var savedTabId = sessionStorage.getItem('current_tab_term_id');
+        var $savedTab = $('.your-ajax-tabs-container a[data-term-id="' + savedTabId + '"]');
+        if ($savedTab.length) {
+            $savedTab.parent('li').addClass('active').siblings().removeClass('active');
+        }
+    }
+
     // 選取所有在 '.your-ajax-tabs-container' 容器內的 'a' 連結，並綁定點擊事件。
     $('.your-ajax-tabs-container').on('click', 'a', function(e) {
         // 阻止連結的預設跳轉行為。
         e.preventDefault();
         
         var $this = $(this);
+        var $parentLi = $this.parent('li');
         
         // 如果點擊的是當前已選中的標籤，則不執行任何操作
-        if ($this.parent('li').hasClass('active')) {
+        if ($parentLi.hasClass('active')) {
             return false;
         }
+        
+        // 更新活動標籤狀態
+        $parentLi.siblings().removeClass('active');
+        $parentLi.addClass('active');
+        
+        // 網站完全公開，無需登入檢查
 
         // --- 資料準備 ---
         var termId = $this.data('term-id'); // 讀取 `<a>` 元素上的 `data-term-id` 屬性值。
@@ -25,6 +61,21 @@ jQuery(document).ready(function($) {
         // 禁用所有標籤點擊，防止重複點擊
         container.find('a').css('pointer-events', 'none');
         
+        // 更新 URL 狀態
+        var newUrl = window.location.pathname;
+        if (termId !== 'all') {
+            newUrl += '?category=' + termId;
+        } else {
+            // 如果是全部標籤，確保移除 category 參數
+            newUrl = window.location.pathname;
+        }
+        window.history.pushState({ termId: termId }, '', newUrl);
+        
+        // 保存當前選中的標籤到 sessionStorage
+        if (typeof sessionStorage !== 'undefined') {
+            sessionStorage.setItem('current_tab_term_id', termId);
+        }
+        
         // 記錄開始時間用於性能監控
         var startTime = new Date().getTime();
         
@@ -34,11 +85,12 @@ jQuery(document).ready(function($) {
             type: 'POST', 
             data: {
                 action: 'your_filter_action', 
-                nonce: your_ajax_obj.nonce, 
+                nonce: your_ajax_obj ? your_ajax_obj.nonce : '', 
                 term_id: termId, 
                 taxonomy: taxonomy,
                 query_id: queryId,
-                timestamp: new Date().getTime() // 防止緩存
+                timestamp: new Date().getTime(), // 防止緩存
+                is_public: '1' // 標記為公開請求
             },
             success: function(response) {
                 // 計算請求耗時
@@ -56,9 +108,14 @@ jQuery(document).ready(function($) {
                 }
 
                 if (response.success) {
-                    // 更新活動標籤
+                    // 更新活動標籤 - 使用點擊的標籤來確保一致性
                     container.find('li').removeClass('active');
-                    $this.parent('li').addClass('active');
+                    $parentLi.addClass('active');
+                    
+                    // 保存當前選中的標籤到 sessionStorage
+                    if (typeof sessionStorage !== 'undefined') {
+                        sessionStorage.setItem('current_tab_term_id', termId);
+                    }
                     
                     // 使用 Elementor Pro 的 AJAX 重新載入功能
                     if (typeof elementorProFrontend !== 'undefined' && elementorProFrontend.modules && elementorProFrontend.modules.loop) {
@@ -70,7 +127,8 @@ jQuery(document).ready(function($) {
                             page: 1,
                             filters: {
                                 'taxonomy': taxonomy,
-                                'term_id': termId === 'all' ? '' : termId
+                                'term_id': termId === 'all' ? '' : termId,
+                                'is_ajax': '1' // 添加標記表示這是 AJAX 請求
                             }
                         }).then(function() {
                             console.log("Loop 重新載入完成");
