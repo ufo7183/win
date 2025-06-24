@@ -18,10 +18,10 @@ function your_ajax_tabs_shortcode_function($atts) {
 
     if (!empty($terms) && !is_wp_error($terms)) {
         // 我們把 taxonomy 也存入 data-* 屬性，方便 JS 讀取
-        echo '<ul class="your-ajax-tabs-container" data-query-id="' . esc_attr($atts['query_id']) . '" data-taxonomy="' . esc_attr($atts['taxonomy']) . '">';
-        echo '<li class="active"><a href="#" data-term-id="all">全部</a></li>';
+        echo '<ul class="yat-custom-tabs-container" data-query-id="' . esc_attr($atts['query_id']) . '" data-taxonomy="' . esc_attr($atts['taxonomy']) . '">';
+        echo '<li class="yat-tab-item yat-active"><a href="#" data-term-id="all">全部</a></li>';
         foreach ($terms as $term) {
-            echo '<li><a href="#" data-term-id="' . esc_attr($term->term_id) . '">' . esc_html($term->name) . '</a></li>';
+            echo '<li class="yat-tab-item"><a href="#" data-term-id="' . esc_attr($term->term_id) . '">' . esc_html($term->name) . '</a></li>';
         }
         echo '</ul>';
     }
@@ -188,16 +188,29 @@ function display_team_debug_log() {
 add_action('wp_enqueue_scripts', 'your_ajax_tabs_enqueue_scripts');
 function your_ajax_tabs_enqueue_scripts() {
     // 載入 JS
+
+    // 傳遞資料給 JS
+    // 載入 JS
     wp_enqueue_script(
-        'your-ajax-tabs-script',
+        'yat-custom-tabs-script',
         get_stylesheet_directory_uri() . '/tab切換JS.js',
         array('jquery'),
-        '1.0.2', // 提升版本號，強制瀏覽器更新
+        '1.1.0', // 更新版本號
         true
     );
+    
+    // 添加內聯樣式來避免衝突
+    $custom_css = "
+        .yat-custom-tabs-container { margin: 20px 0; }
+        .yat-custom-tabs-container .yat-tab-item { display: inline-block; margin-right: 10px; }
+        .yat-custom-tabs-container .yat-tab-item a { text-decoration: none; padding: 5px 10px; }
+        .yat-custom-tabs-container .yat-tab-item.yat-active a { font-weight: bold; }
+    ";
+    wp_add_inline_style('elementor-frontend', $custom_css);
+    
     // 傳遞資料給 JS
     wp_localize_script(
-        'your-ajax-tabs-script',
+        'yat-custom-tabs-script',
         'your_ajax_obj',
         array(
             'ajax_url' => admin_url('admin-ajax.php'),

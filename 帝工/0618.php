@@ -619,8 +619,8 @@ function newtide_display_admin_order_item_field_v13($item_id, $item) {
 
     // 使用正確的 KEY 來讀取資料
     $value = $item->get_meta(NEWTIDE_META_KEY_V13);
-	
-	// >>> 在這裡加入日誌 <<<
+    
+    // >>> 在這裡加入日誌 <<<
     newtide_debug_log_v13('【讀取顯示】後台嘗試讀取訂單項目 Meta', [
         'item_id' => $item_id,
         'product_name' => $item->get_name(),
@@ -1341,10 +1341,81 @@ function newtide_ajax_update_cart_quantities() {
 // --- 處理詢價單提交 ---
 add_action('init', 'newtide_handle_custom_checkout');
 
+// 添加自定義字段到訂單郵件
+add_action('woocommerce_email_after_order_table', 'add_custom_fields_to_emails', 10, 4);
+
+function add_custom_fields_to_emails($order, $sent_to_admin, $plain_text, $email) {
+    if ($email->id === 'new_order' || $email->id === 'customer_processing_order') {
+        $meta_fields = [
+            'Gender' => '性別',
+            'Department' => '部門',
+            'Job Title' => '職稱',
+            'Subscribe to newsletter' => '訂閱電子報',
+            'Company URL' => '公司網址',
+            'Industry' => '產業',
+            'Main Product' => '主要產品',
+            'Fax' => '傳真',
+            'Business Type' => '業務類型',
+            'Request of detail information' => '詳細資訊請求'
+        ];
+
+        echo '<div style="margin-bottom: 20px;">';
+        echo '<h2>'.__('Additional Information', 'woocommerce').'</h2>';
+        echo '<table class="td" cellspacing="0" cellpadding="6" style="width: 100%; font-family: \'Helvetica Neue\', Helvetica, Roboto, Arial, sans-serif;" border="1">';
+        
+        foreach ($meta_fields as $key => $label) {
+            $value = $order->get_meta($key);
+            if (!empty($value)) {
+                echo '<tr><th style="text-align: left; vertical-align: middle; padding: 12px; border: 1px solid #e4e4e4;">' . esc_html($label) . ':</th>';
+                echo '<td style="text-align: left; vertical-align: middle; padding: 12px; border: 1px solid #e4e4e4;">' . esc_html($value) . '</td></tr>';
+            }
+        }
+        
+        // 添加訂單備註
+        if ($order->get_customer_note()) {
+            echo '<tr><th style="text-align: left; vertical-align: middle; padding: 12px; border: 1px solid #e4e4e4;">' . __('Note', 'woocommerce') . ':</th>';
+            echo '<td style="text-align: left; vertical-align: middle; padding: 12px; border: 1px solid #e4e4e4;">' . esc_html($order->get_customer_note()) . '</td></tr>';
+        }
+        
+        echo '</table></div>';
+    }
+}
+
 function newtide_handle_custom_checkout() {
     // Nonce and cart empty checks... (same as before)
     if (!isset($_POST['newtide_checkout_nonce']) || !wp_verify_nonce($_POST['newtide_checkout_nonce'], 'newtide-custom-checkout')) { return; }
     if (WC()->cart->is_empty()) { wc_add_notice('Your inquiry cart is empty.', 'error'); return; }
+
+    // --- 【修正】在處理訂單前，先根據表單提交的內容更新購物車數量 ---
+    if (isset($_POST['cart']) && is_array($_POST['cart'])) {
+        newtide_debug_log_v13('開始根據 POST 更新購物車數量', $_POST['cart']);
+        $cart_updated = false;
+        foreach ($_POST['cart'] as $cart_item_key => $item_data) {
+            // 確保購物車項目金鑰存在於當前購物車中
+            if (isset(WC()->cart->cart_contents[$cart_item_key]) && isset($item_data['qty'])) {
+                $new_quantity = absint($item_data['qty']);
+                $current_quantity = WC()->cart->cart_contents[$cart_item_key]['quantity'];
+
+                if ($new_quantity !== $current_quantity) {
+                    newtide_debug_log_v13('更新項目數量', [
+                        'cart_item_key' => $cart_item_key,
+                        'old_quantity' => $current_quantity,
+                        'new_quantity' => $new_quantity
+                    ]);
+                    // 更新購物車中特定商品的數量
+                    WC()->cart->set_quantity($cart_item_key, $new_quantity, false);
+                    $cart_updated = true;
+                }
+            }
+        }
+        
+        // 如果購物車有更新，則重新計算總計
+        if ($cart_updated) {
+            WC()->cart->calculate_totals();
+            newtide_debug_log_v13('購物車數量更新完畢，已重新計算總計');
+        }
+    }
+    // --- 修正結束 ---
 
     newtide_debug_log_v13('表單提交開始', $_POST);
 
@@ -1502,31 +1573,31 @@ function newtide_handle_custom_checkout() {
         // 如果成功從 POST 讀取到值，才執行儲存
         if ($item_id && !empty($schedule_value)) {
 
-			// 為了讓其他功能（例如重新整理頁面時能記住選項）正常運作，
-			// 我們順便把這個值更新回購物車 Session 中
-			WC()->cart->cart_contents[$cart_item_key][NEWTIDE_META_KEY_V13] = $schedule_value;
+            // 為了讓其他功能（例如重新整理頁面時能記住選項）正常運作，
+            // 我們順便把這個值更新回購物車 Session 中
+            WC()->cart->cart_contents[$cart_item_key][NEWTIDE_META_KEY_V13] = $schedule_value;
 
-			// 獲取剛剛建立的訂單項目物件
-			$order_item = $order->get_item($item_id);
+            // 獲取剛剛建立的訂單項目物件
+            $order_item = $order->get_item($item_id);
 
-			if ($order_item) {
-				// 使用常數來更新 Meta，確保一致性
-				$order_item->update_meta_data(NEWTIDE_META_KEY_V13, $schedule_value);
+            if ($order_item) {
+                // 使用常數來更新 Meta，確保一致性
+                $order_item->update_meta_data(NEWTIDE_META_KEY_V13, $schedule_value);
 
-				// 儲存這個訂單項目的變更
-				$order_item->save();
+                // 儲存這個訂單項目的變更
+                $order_item->save();
 
-				// 記錄調試信息，確認儲存動作已執行
-				newtide_debug_log_v13('【儲存】已執行 update_meta_data', [
-					'item_id'    => $item_id,
-					'meta_key'   => NEWTIDE_META_KEY_V13,
-					'meta_value' => $schedule_value
-				]);
-			}
-		}
-	}
-	// 在迴圈結束後，手動更新一次購物車 session，以保存我們剛剛寫入的 schedule 值
-	WC()->cart->set_session();
+                // 記錄調試信息，確認儲存動作已執行
+                newtide_debug_log_v13('【儲存】已執行 update_meta_data', [
+                    'item_id'    => $item_id,
+                    'meta_key'   => NEWTIDE_META_KEY_V13,
+                    'meta_value' => $schedule_value
+                ]);
+            }
+        }
+    }
+    // 在迴圈結束後，手動更新一次購物車 session，以保存我們剛剛寫入的 schedule 值
+    WC()->cart->set_session();
     
     // 計算訂單總額
     $order->calculate_totals();

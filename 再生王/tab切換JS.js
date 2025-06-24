@@ -13,9 +13,9 @@ jQuery(document).ready(function($) {
     // 頁面載入時檢查 URL 參數並設置對應的標籤
     var categoryParam = urlParams.get('category');
     if (categoryParam) {
-        var $targetTab = $('.your-ajax-tabs-container a[data-term-id="' + categoryParam + '"]');
+        var $targetTab = $('.yat-custom-tabs-container a[data-term-id="' + categoryParam + '"]');
         if ($targetTab.length) {
-            $targetTab.parent('li').addClass('active').siblings().removeClass('active');
+            $targetTab.parent('li').addClass('yat-active').siblings().removeClass('yat-active');
             if (typeof sessionStorage !== 'undefined') {
                 sessionStorage.setItem('current_tab_term_id', categoryParam);
             }
@@ -23,14 +23,14 @@ jQuery(document).ready(function($) {
     } else if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('current_tab_term_id')) {
         // 如果 URL 沒有 category 參數，但有保存的 tab 狀態，則恢復
         var savedTabId = sessionStorage.getItem('current_tab_term_id');
-        var $savedTab = $('.your-ajax-tabs-container a[data-term-id="' + savedTabId + '"]');
+        var $savedTab = $('.yat-custom-tabs-container a[data-term-id="' + savedTabId + '"]');
         if ($savedTab.length) {
-            $savedTab.parent('li').addClass('active').siblings().removeClass('active');
+            $savedTab.parent('li').addClass('yat-active').siblings().removeClass('yat-active');
         }
     }
 
-    // 選取所有在 '.your-ajax-tabs-container' 容器內的 'a' 連結，並綁定點擊事件。
-    $('.your-ajax-tabs-container').on('click', 'a', function(e) {
+    // 選取所有在 '.yat-custom-tabs-container' 容器內的 'a' 連結，並綁定點擊事件。
+    $('.yat-custom-tabs-container').on('click', 'a', function(e) {
         // 阻止連結的預設跳轉行為。
         e.preventDefault();
         
@@ -38,19 +38,19 @@ jQuery(document).ready(function($) {
         var $parentLi = $this.parent('li');
         
         // 如果點擊的是當前已選中的標籤，則不執行任何操作
-        if ($parentLi.hasClass('active')) {
+        if ($parentLi.hasClass('yat-active')) {
             return false;
         }
         
         // 更新活動標籤狀態
-        $parentLi.siblings().removeClass('active');
-        $parentLi.addClass('active');
+        $parentLi.siblings().removeClass('yat-active');
+        $parentLi.addClass('yat-active');
         
         // 網站完全公開，無需登入檢查
 
         // --- 資料準備 ---
         var termId = $this.data('term-id'); // 讀取 `<a>` 元素上的 `data-term-id` 屬性值。
-        var container = $this.closest('.your-ajax-tabs-container'); // 找到父層容器 <ul>。
+        var container = $this.closest('.yat-custom-tabs-container'); // 找到父層容器 <ul>。
         var queryId = container.data('query-id'); // 從容器讀取 `data-query-id` 屬性值。
         var taxonomy = container.data('taxonomy'); // 從容器讀取 data-taxonomy 屬性
         var $loopGrid = $('#' + queryId);
@@ -109,8 +109,8 @@ jQuery(document).ready(function($) {
 
                 if (response.success) {
                     // 更新活動標籤 - 使用點擊的標籤來確保一致性
-                    container.find('li').removeClass('active');
-                    $parentLi.addClass('active');
+                    container.find('li').removeClass('yat-active');
+                    $parentLi.addClass('yat-active');
                     
                     // 保存當前選中的標籤到 sessionStorage
                     if (typeof sessionStorage !== 'undefined') {
