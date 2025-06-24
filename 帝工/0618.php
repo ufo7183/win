@@ -98,6 +98,9 @@ function newtide_register_polylang_strings() {
     foreach ($all_strings as $string) {
         pll_register_string($string, $string, 'newtide-plugin');
     }
+
+    // 新增 Customer information 字串
+    pll_register_string('Customer information', 'Customer information', 'newtide-plugin');
 }
 
 // 在插件初始化時註冊字符串
@@ -1360,7 +1363,7 @@ function add_custom_fields_to_emails($order, $sent_to_admin, $plain_text, $email
         ];
 
         echo '<div style="margin-bottom: 20px;">';
-        echo '<h2>'.__('Additional Information', 'woocommerce').'</h2>';
+        echo '<h2>'.pll__('Customer information', 'newtide-plugin').'</h2>';
         echo '<table class="td" cellspacing="0" cellpadding="6" style="width: 100%; font-family: \'Helvetica Neue\', Helvetica, Roboto, Arial, sans-serif;" border="1">';
         
         foreach ($meta_fields as $key => $label) {
@@ -1680,3 +1683,104 @@ add_action('shutdown', function() use ($order_id) {
     wp_safe_redirect($redirect_url);
     exit;
 }
+
+// --- 【功能】隱藏 WooCommerce 價格 ---
+
+// 1. 在後台訂單頁面隱藏價格相關欄位
+add_action('admin_head', 'newtide_hide_price_in_admin_order');
+function newtide_hide_price_in_admin_order() {
+    // 只在訂單編輯頁面生效
+    $screen = get_current_screen();
+    if ($screen && ($screen->id === 'shop_order' || $screen->id === 'woocommerce_page_wc-orders')) {
+        echo '<style>
+            /* 隱藏訂單項目中的單價和總價 */
+            .woocommerce_order_items .item_cost,
+            .woocommerce_order_items .line_cost {
+                display: none !important;
+            }
+            /* 隱藏訂單總計區塊中的所有價格相關項目 */
+            .wc-order-totals .total,
+            .wc-order-totals .tax {
+                 display: none !important;
+            }
+            /* 隱藏退款相關的顯示 */
+            .wc-order-refund-items .line_cost,
+            .wc-order-refund-items .refund_line_tax {
+                display: none !important;
+            }
+        </style>';
+    }
+}
+
+// 2. 從 WooCommerce 電子郵件中移除價格
+add_filter('woocommerce_get_price_html', 'newtide_hide_price_in_emails', 9999, 2);
+add_filter('woocommerce_cart_item_price', 'newtide_hide_price_in_emails', 9999, 2);
+add_filter('woocommerce_cart_item_subtotal', 'newtide_hide_price_in_emails', 9999, 2);
+add_filter('woocommerce_cart_subtotal', 'newtide_hide_price_in_emails', 9999, 2);
+add_filter('woocommerce_order_formatted_line_subtotal', 'newtide_hide_price_in_emails', 9999, 2);
+add_filter('woocommerce_get_formatted_order_total', 'newtide_hide_price_in_emails', 9999, 2);
+
+function newtide_hide_price_in_emails($price, $product_or_order) {
+    // 在所有地方都隱藏價格，因為這是詢價單系統
+    return '';
+}
+
+// 3. 確保在訂單項目表格中也不會出現價格相關的總計
+add_filter('woocommerce_order_item_get_formatted_meta_data', 'newtide_remove_price_meta_from_emails', 10, 2);
+function newtide_remove_price_meta_from_emails($formatted_meta, $item) {
+    foreach ($formatted_meta as $key => $meta) {
+        // 移除任何看起來像價格的 meta data
+        if (stripos($meta->key, 'price') !== false || stripos($meta->key, 'total') !== false || stripos($meta->key, 'cost') !== false) {
+            unset($formatted_meta[$key]);
+        }
+    }
+    return $formatted_meta;
+}
+
+// 4. 移除訂單總計區塊
+add_action('woocommerce_email_order_details', 'newtide_remove_order_totals_from_email', 1);
+function newtide_remove_order_totals_from_email() {
+    remove_action('woocommerce_email_order_details', array(WC()->mailer()->emails['WC_Email_New_Order'], 'order_details'), 10);
+    remove_action('woocommerce_email_order_details', array(WC()->mailer()->emails['WC_Email_Customer_Processing_Order'], 'order_details'), 10);
+    // 如果有其他郵件類型也需要移除，可以在此處添加
+}
+
+// 重新掛載一個不包含價格的自訂版本 order_details
+add_action('woocommerce_email_order_details', 'newtide_custom_email_order_details', 5, 4);
+function newtide_custom_email_order_details($order, $sent_to_admin, $plain_text, $email) {
+    // 這裡可以複製 woocommerce/templates/emails/email-order-details.php 的內容
+    // 然後手動移除所有價格相關的欄位，只留下商品名稱、SKU、數量等
+    // 為了簡化，我們先只顯示一個簡單的列表
+    
+    $output = '';
+    if (!$plain_text) {
+        $output .= '<h2 style="color: #555; display: block; font-family: \"Helvetica Neue\", Helvetica, Roboto, Arial, sans-serif; font-size: 18px; font-weight: bold; line-height: 130%; margin: 0 0 18px; text-align: left;">' . __('Order details', 'woocommerce') . '</h2>';
+        $output .= '<table cellspacing="0" cellpadding="6" style="width: 100%; font-family: \"Helvetica Neue\", Helvetica, Roboto, Arial, sans-serif; margin-bottom: 40px;" border="1">';
+        $output .= '<thead><tr>';
+        $output .= '<th scope="col" style="text-align:left; border: 1px solid #eee;">' . __('Product', 'woocommerce') . '</th>';
+        $output .= '<th scope="col" style="text-align:left; border: 1px solid #eee;">' . __('Quantity', 'woocommerce') . '</th>';
+        $output .= '</tr></thead>';
+        $output .= '<tbody>';
+        
+        foreach ($order->get_items() as $item_id => $item) {
+            $product = $item->get_product();
+            $output .= '<tr>';
+            $output .= '<td style="text-align:left; vertical-align:middle; border: 1px solid #eee; padding: 12px;">' . $product->get_name();
+            // 顯示變體等其他信息
+            wc_display_item_meta($item, array('show_sku' => true, 'echo' => false));
+            $output .= '</td>';
+            $output .= '<td style="text-align:left; vertical-align:middle; border: 1px solid #eee; padding: 12px;">' . $item->get_quantity() . '</td>';
+            $output .= '</tr>';
+        }
+        
+        $output .= '</tbody></table>';
+    } else {
+        // 純文字版本的郵件
+        $output .= strtoupper(__('Order details', 'woocommerce')) . "\n\n";
+        foreach ($order->get_items() as $item_id => $item) {
+            $output .= $item->get_product()->get_name() . ' x ' . $item->get_quantity() . "\n";
+        }
+    }
+    echo $output;
+}
+
