@@ -1440,6 +1440,11 @@ function newtide_handle_custom_checkout() {
         if ($quantity < 1) {
             $quantity = 1; // 確保至少為1
         }
+        
+        // 確保購物車項目的數量正確
+        if (isset($cart_item['quantity'])) {
+            $quantity = max(1, (int)$cart_item['quantity']);
+        }
 
         // 【核心修正】直接從 $_POST 讀取 schedule 的值
         $schedule_value = '';
@@ -1457,7 +1462,42 @@ function newtide_handle_custom_checkout() {
 
         // 將產品加入訂單
         $product = $cart_item['data'];
-        $item_id = $order->add_product($product, $quantity);
+        
+        // 準備要傳遞的參數
+        $args = array(
+            'quantity' => $quantity,
+            'variation' => $cart_item['variation'] ?? array(),
+            'totals' => array(
+                'subtotal' => $cart_item['line_subtotal'],
+                'subtotal_tax' => $cart_item['line_subtotal_tax'],
+                'total' => $cart_item['line_total'],
+                'tax' => $cart_item['line_tax'],
+                'tax_data' => $cart_item['line_tax_data']
+            )
+        );
+        
+        // 使用 WooCommerce 的 add_product 方法添加商品
+        $item_id = $order->add_product($product, $args['quantity'], $args);
+        
+        // 記錄調試信息
+        newtide_debug_log_v13('添加產品到訂單', [
+            'product_id' => $product->get_id(),
+            'product_name' => $product->get_name(),
+            'passed_quantity' => $quantity,
+            'cart_item_quantity' => $cart_item['quantity'],
+            'cart_item_total' => $cart_item['line_total'],
+            'cart_item_data' => $cart_item,
+            'args' => $args
+        ]);
+        
+        // 確保訂單項目的數量正確設置
+        if ($item_id) {
+            $order_item = $order->get_item($item_id);
+            if ($order_item) {
+                $order_item->set_quantity($quantity);
+                $order_item->save();
+            }
+        }
 
         // 如果成功從 POST 讀取到值，才執行儲存
         if ($item_id && !empty($schedule_value)) {
