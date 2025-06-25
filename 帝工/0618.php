@@ -114,6 +114,14 @@ function newtide_final_plugin_init_v13() {
         return;
     }
 
+    // 註冊隱私權政策必填的錯誤訊息
+    if (function_exists('pll_register_string')) {
+        pll_register_string('You must acknowledge and agree to the privacy policy to proceed.', 'You must acknowledge and agree to the privacy policy to proceed.', 'newtide-plugin');
+    }
+
+    // 攔截表單提交以進行驗證
+    add_action('init', 'newtide_check_privacy_policy_submission_v13');
+
     // 註冊 Polylang 字串
     if (function_exists('pll_register_string')) {
         // 購物車相關字串
@@ -223,6 +231,22 @@ function newtide_final_plugin_init_v13() {
     // --- 額外的調試顯示 ---
     // add_action('woocommerce_after_order_itemmeta', 'newtide_debug_display_all_meta_v13', 10, 2);
 } 
+
+// --- 驗證隱私權政策勾選 ---
+function newtide_check_privacy_policy_submission_v13() {
+    // 檢查是否為我們的表單提交，並驗證 nonce
+    if (isset($_POST['newtide_checkout_nonce']) && wp_verify_nonce($_POST['newtide_checkout_nonce'], 'newtide-custom-checkout')) {
+        
+        // 檢查隱私權政策是否被勾選
+        if (empty($_POST['privacy_policy_agreement'])) {
+            // 如果未勾選，使用 WooCommerce 的通知系統顯示錯誤
+            if (function_exists('wc_add_notice')) {
+                // 使用 pll__() 來獲取翻譯後的字串
+                wc_add_notice(pll__('You must acknowledge and agree to the privacy policy to proceed.', 'newtide-plugin'), 'error');
+            }
+        }
+    }
+}
 
 // --- 新增管理員選單 ---
 function newtide_add_admin_menu_v13() {
@@ -876,7 +900,7 @@ function newtide_custom_cart_shortcode_v13($atts) {
                 color: #c82333; 
             }
             .cart-actions {
-                text-align: right; 
+                text-align: center; 
                 margin-top: 20px; 
             }
             .button {
@@ -1288,7 +1312,10 @@ function newtide_custom_cart_shortcode_v13($atts) {
 
                 <div class="form-row">
                     <div class="form-col full-width privacy-policy-notice">
-                        <span><?php echo pll__('I acknowledge and agree that Newtide may collect, process, and use the personal data I have provided, within a reasonable and necessary scope and in accordance with applicable laws and regulations. Such data may be used for marketing communications, customer service, satisfaction surveys, and other business-related contact purposes.', 'newtide-plugin'); ?></span>
+                        <label style="display: flex; align-items: flex-start; text-align: left;">
+                            <input type="checkbox" name="privacy_policy_agreement" value="1" required style="margin-top: 5px; margin-right: 10px; flex-shrink: 0;">
+                            <span><?php echo pll__('I acknowledge and agree that Newtide may collect, process, and use the personal data I have provided, within a reasonable and necessary scope and in accordance with applicable laws and regulations. Such data may be used for marketing communications, customer service, satisfaction surveys, and other business-related contact purposes.', 'newtide-plugin'); ?></span>
+                        </label>
                     </div>
                 </div>
             </div>
