@@ -109,12 +109,19 @@ if (!function_exists('rs_video_slider_shortcode')) {
             align-items: center;
             justify-content: center;
             width: 100%;
-            padding: 0 17px; /* Space for arrows */
+            gap: 20px; /* 1. Arrow distance */
             box-sizing: border-box;
+            padding: 0 10px;
+        }
+        .rs-video-slider-navigation { /* 4. Ensure arrows are visible */
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
         }
         .rs-video-slider {
-            width: 100%;
-            max-width: 1158px;
+            flex: 1; /* 4. Allow slider to fill space */
+            min-width: 0; /* 4. Allow slider to shrink */
+            max-width: 990px;
         }
         .rs-video-slider .rs-item {
             text-align: center;
@@ -136,6 +143,7 @@ if (!function_exists('rs_video_slider_shortcode')) {
             height: 0;
             background: #000;
             overflow: hidden;
+            border-radius: 15px; /* 2. Video corner radius */
         }
         .rs-video-wrapper iframe, .rs-video-wrapper video {
             position: absolute;
@@ -148,20 +156,40 @@ if (!function_exists('rs_video_slider_shortcode')) {
             color: #A2B6F2;
             text-align: center;
             font-family: "Noto Serif TC";
-            font-size: 15px;
+            font-size: 15px; /* 5. Title size */
             font-weight: 500;
             line-height: 30px;
             margin-top: 18px;
         }
         .rs-slider-arrow {
-            background: none; border: none; cursor: pointer; padding: 0; z-index: 10;
+            background: none; 
+            border: none; 
+            cursor: pointer; 
+            padding: 0; 
+            z-index: 10;
+            box-shadow: none; /* 3. Remove arrow shadow */
+        }
+        .rs-slider-arrow:hover,
+        .rs-slider-arrow:active,
+        .rs-slider-arrow:focus {
+            background: transparent !important;
+            box-shadow: none !important;
+            outline: none !important;
         }
         @media (max-width: 767px) {
+            .rs-video-slider-container { 
+                gap: 10px; /* 4. Adjust gap for mobile */
+            }
             .rs-video-slider .owl-item.center .rs-video-item {
                 transform: scale(1.05);
             }
-            .rs-video-slider-container { padding: 0 5px; }
             .rs-slider-arrow img { width: 35px; height: 35px; }
+        }
+        @media (max-width: 599px) {
+            .rs-video-slider .rs-video-item {
+                transform: scale(0.85);
+                opacity: 1;
+            }
         }
         </style>
 

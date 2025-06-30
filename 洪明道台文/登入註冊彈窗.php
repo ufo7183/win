@@ -30,6 +30,7 @@ if (!class_exists('AMD_Login_Popup_Manager')) {
             add_action('wp_enqueue_scripts', [self::class, 'register_scripts']);
             add_action('wp_ajax_nopriv_amd_ajax_login', [self::class, 'ajax_login_handler']);
             add_action('wp_ajax_nopriv_amd_ajax_register', [self::class, 'ajax_register_handler']);
+            add_action('wp_ajax_amd_ajax_logout', [self::class, 'ajax_logout_handler']);
         }
 
         public static function render_shortcode($atts) {
@@ -59,11 +60,12 @@ if (!class_exists('AMD_Login_Popup_Manager')) {
                 'is_logged_in'      => $is_logged_in,
                 'register_nonce'    => wp_create_nonce('amd-register-nonce'),
                 'login_nonce'       => wp_create_nonce('amd-login-nonce'),
+                'logout_nonce'      => wp_create_nonce('amd-logout-nonce'),
                 'google_login_html' => self::$google_login_html,
                 'user_info'         => $is_logged_in ? [
                     'display_name' => $current_user->display_name,
                     'email'        => $current_user->user_email,
-                    'logout_url'   => wp_logout_url(home_url()),
+                    'logout_url'   => '#', // Handled by AJAX
                     'admin_url'    => admin_url(),
                     'profile_url'  => get_edit_user_link($current_user->ID),
                 ] : null,
@@ -117,24 +119,22 @@ if (!class_exists('AMD_Login_Popup_Manager')) {
 
         private static function render_logged_in_popup() {
             ?>
-            <div id="amd-user-menu-backdrop" class="amd-popup-backdrop">
-                <div data-layer="state=logout" class="StateLogout" style="padding: 20px 15px; background: var(--black, #222220); border-radius: 10px; justify-content: flex-start; align-items: center; gap: 10px; display: inline-flex; position:relative;">
-                    <button id="amd-popup-close" class="amd-popup-close-btn" style="color:white; top:5px; right:10px;">&times;</button>
+            <div id="amd-user-menu-popup" style="display: none; position: absolute; z-index: 100001;">
+                <div data-layer="state=logout" class="StateLogout" style="padding: 20px 15px; background: var(--black, #222220); border-radius: 10px; justify-content: flex-start; align-items: center; gap: 10px; display: inline-flex;">
                     <div data-layer="Frame 84" class="Frame84" style="flex-direction: column; justify-content: flex-start; align-items: center; gap: 20px; display: inline-flex;">
                         <div data-layer="Frame 83" class="Frame83" style="flex-direction: column; justify-content: flex-start; align-items: flex-start; gap: 12px; display: flex;">
                             <div data-layer="Frame 81" class="Frame81" style="justify-content: flex-start; align-items: center; gap: 5px; display: inline-flex;">
-                                <div data-svg-wrapper data-layer="Ellipse 1" class="Ellipse1"><svg width="34" height="32" viewBox="0 0 34 32" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="16.9256" cy="16" rx="16.9256" ry="16" fill="#EBEBEB"/></svg></div>
-                                <div data-svg-wrapper data-layer="login" class="Login"><svg width="16" height="15" viewBox="0 0 16 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.92579 0.333374C8.95451 0.333374 9.94109 0.719682 10.6685 1.40732C11.3959 2.09495 11.8046 3.02758 11.8046 4.00004C11.8046 4.9725 11.3959 5.90513 10.6685 6.59277C9.94109 7.2804 8.95451 7.66671 7.92579 7.66671C6.89707 7.66671 5.91049 7.2804 5.18307 6.59277C4.45566 5.90513 4.047 4.9725 4.047 4.00004C4.047 3.02758 4.45566 2.09495 5.18307 1.40732C5.91049 0.719682 6.89707 0.333374 7.92579 0.333374ZM7.92579 9.50004C12.2118 9.50004 15.6834 11.1409 15.6834 13.1667V15H0.168213V13.1667C0.168213 11.1409 3.63973 9.50004 7.92579 9.50004Z" fill="var(--black, #222220)"/></svg></div>
-                                <div data-layer="Frame 80" class="Frame80" style="width: 88.86px; height: 22px; position: relative;">
-                                    <div data-layer="username" class="Username" style="left: 0.15px; top: -5px; position: absolute; color: white; font-size: 12px; font-family: Inter; font-weight: 400; line-height: 25px; word-wrap: break-word;">username</div>
-                                    <div data-layer="username@gmail.com" class="UsernameGmailCom" style="width: 88.86px; left: 0px; top: 11px; position: absolute; color: white; font-size: 8px; font-family: Inter; font-weight: 400; line-height: 25px; word-wrap: break-word;">username@gmail.com</div>
+                                <img class="amd-user-avatar" src="wp-content/uploads/2025/06/member-2.png" style="width: 34px; height: 32px; border-radius: 50%;" alt="User Avatar">
+                                <div data-layer="Frame 80" class="Frame80" style="width: 88.86px; height: 22px; position: relative; overflow: hidden;">
+                                    <div data-layer="username" class="Username" style="position: absolute; color: white; font-size: 12px; font-family: 'Noto Serif TC', serif; font-weight: 400; line-height: 1.2; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; width: 100%;">username</div>
+                                    <div data-layer="username@gmail.com" class="UsernameGmailCom" style="position: absolute; top: 14px; color: white; font-size: 8px; font-family: 'Noto Serif TC', serif; font-weight: 400; line-height: 1.2; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; width: 100%;">username@gmail.com</div>
                                 </div>
                             </div>
                             <div data-svg-wrapper data-layer="Vector 1" class="Vector1"><svg width="128" height="2" viewBox="0 0 128 2" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 1H127.5" stroke="white"/></svg></div>
                         </div>
-                        <div data-layer="Frame 82" class="Frame82" style="width: 128px; flex-direction: column; justify-content: flex-start; align-items: center; gap: 10px; display: flex; font-family: Inter; font-size: 12px; line-height: 25px;">
-                            <a href="#" data-link="admin" style="color:white; text-decoration:none;">控制台</a>
-                            <a href="#" data-link="profile" style="color:white; text-decoration:none;">編輯個人資料</a>
+                        <div data-layer="Frame 82" class="Frame82" style="width: 128px; flex-direction: column; justify-content: flex-start; align-items: center; gap: 10px; display: flex; font-family: 'Noto Serif TC', serif; font-size: 12px; line-height: 25px;">
+                            <a href="/my-account" data-link="my-account" style="color:white; text-decoration:none;">控制台</a>
+                            <a href="/my-account/edit-account" data-link="profile" style="color:white; text-decoration:none;">編輯個人資料</a>
                             <a href="#" data-link="logout" style="color:white; text-decoration:underline;">登出</a>
                         </div>
                     </div>
@@ -146,24 +146,44 @@ if (!class_exists('AMD_Login_Popup_Manager')) {
         private static function render_styles() {
             ?>
             <style>
-                :root { --amd-black: #222220; --amd-blue: #3D84F3; --amd-grey1: #EAEAEA; --amd-grey2: #D9D9D9; --amd-grey3: #ACACAC; --amd-white: #FFFFFF; }
+                :root { --amd-black: #222220; --amd-grey5: #6c757d; --amd-grey1: #EAEAEA; --amd-grey2: #D9D9D9; --amd-grey3: #ACACAC; --amd-white: #FFFFFF; }
                 .amd-popup-trigger-button { display: inline-block; } .amd-popup-trigger-button img { max-height: 40px; vertical-align: middle; }
                 .amd-popup-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 100000; justify-content: center; align-items: center; }
                 .amd-popup-container { background-color: var(--amd-grey1); border-radius: 10px; width: 370px; max-width: 90%; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); font-family: 'Noto Serif TC', 'Noto Serif', serif; }
                 .amd-popup-close-btn { position: absolute; top: 10px; right: 15px; font-size: 28px; font-weight: bold; color: var(--amd-grey3); background: none; border: none; cursor: pointer; line-height: 1; padding: 0; }
                 .amd-popup-tabs { display: flex; }
-                .amd-popup-tab-btn { flex: 1; height: 56px; display: flex; justify-content: center; align-items: center; background-color: var(--amd-grey2); color: var(--amd-grey3); border: none; cursor: pointer; font-size: 16px; letter-spacing: 3.20px; line-height: 36px; transition: background-color 0.3s, color 0.3s; }
+                .amd-popup-tab-btn { flex: 1; height: 56px; display: flex; justify-content: center; align-items: center; background-color: var(--amd-grey2); color: var(--amd-grey3); border: none; cursor: pointer; font-size: 16px; letter-spacing: 3.20px; line-height: 36px; transition: background-color 0.3s, color 0.3s; font-family: 'Noto Serif TC', serif; }
                 .amd-popup-tab-btn:first-child { border-top-left-radius: 10px; } .amd-popup-tab-btn:last-child { border-top-right-radius: 10px; }
                 .amd-popup-tab-btn.active { background-color: var(--amd-grey1); color: var(--amd-black); }
                 .amd-popup-content { padding: 44px; text-align: center; }
                 .amd-popup-message-area { display: none; padding: 14px 20px; margin-bottom: 20px; border-radius: 10px; color: var(--amd-black); font-size: 12px; letter-spacing: 1.2px; line-height: 1.5; text-align: left; }
-                .amd-popup-message-area.success { background-color: #d4edda; color: #155724; } .amd-popup-message-area.error { background-color: #f8d7da; color: #721c24; }
+                .amd-popup-message-area.success { background-color: var(--amd-grey2); color: var(--amd-black); }
+                .amd-popup-message-area.error { background-color: #ED5454; color: white; font-family: 'Noto Serif TC', serif; letter-spacing: 0.05em; }
+                .amd-popup-message-area.error a { color: white; text-decoration: underline; }
+                .amd-popup-message-area.error span { font-family: 'Noto Sans TC', sans-serif; }
                 .amd-form-group { margin-bottom: 20px; text-align: left; } .amd-form-group label { display: block; margin-bottom: 10px; font-size: 12px; letter-spacing: 1.2px; }
                 .amd-form-group input[type="text"], .amd-form-group input[type="email"], .amd-form-group input[type="password"] { width: 100%; height: 48px; padding: 0 20px; background-color: var(--amd-white); border: none; border-radius: 10px; box-sizing: border-box; }
                 .amd-privacy-group { display: flex; align-items: center; gap: 10px; } .amd-privacy-group input[type="checkbox"] { width: 20px; height: 20px; flex-shrink: 0; }
-                .amd-privacy-group label { margin-bottom: 0; } .amd-privacy-group a { color: var(--amd-blue); text-decoration: none; }
-                .amd-form-submit-btn { width: 100%; height: 48px; background-color: var(--amd-black); color: var(--amd-white); border: none; border-radius: 10px; font-size: 20px; font-weight: 600; letter-spacing: 4px; cursor: pointer; transition: background-color 0.3s; }
-                .amd-form-submit-btn:disabled { background-color: #6c757d; cursor: not-allowed; }
+                .amd-privacy-group label { margin-bottom: 0; } .amd-privacy-group a { color: var(--amd-black); text-decoration: none; transition: color 0.3s; }
+                .amd-form-submit-btn { width: 100%; height: 48px; background-color: var(--amd-black); color: var(--amd-white); border: none; border-radius: 10px; font-size: 20px; font-weight: 600; letter-spacing: 4px; cursor: pointer; transition: background-color 0.3s; font-family: 'Noto Serif TC', serif; }
+                                .amd-form-submit-btn:disabled { background-color: var(--amd-grey5); cursor: not-allowed; }
+
+                /* --- Hover States --- */
+                .amd-privacy-group a:hover,
+                .amd-back-link:hover,
+                .amd-popup-close-btn:hover,
+                .amd-form-submit-btn:hover {
+                    background-color: #646464;
+                    color: #FFF;
+                }
+                .amd-popup-tab-btn:hover {
+                    background-color: #646464 !important;
+                    color: #FFF !important;
+                }
+                #amd-user-menu-popup a:hover {
+                    background-color: #646464;
+                    color: #FFF !important;
+                }
                 .amd-separator { height: 1px; background-color: var(--amd-black); margin: 20px 0; }
                 .amd-google-placeholder > div { margin: 10px 0 0 0 !important; }
                 .amd-back-link-wrapper { margin-top: 20px; } .amd-back-link { color: var(--amd-black); font-size: 12px; text-decoration: none; letter-spacing: 1.2px; display: inline-flex; align-items: center; gap: 3px; }
@@ -178,55 +198,90 @@ if (!class_exists('AMD_Login_Popup_Manager')) {
             document.addEventListener('DOMContentLoaded', function() {
                 const trigger = document.getElementById('amd-popup-trigger');
                 if (!trigger) return;
-
+        
                 const { is_logged_in, user_info, ajax_url, home_url, login_nonce, register_nonce, google_login_html } = amd_popup_vars;
-
+        
                 const loggedOutBackdrop = document.getElementById('amd-login-popup-backdrop');
-                const loggedInBackdrop = document.getElementById('amd-user-menu-backdrop');
-
-                function showPopup(backdrop) { if(backdrop) backdrop.style.display = 'flex'; }
+                const loggedInMenu = document.getElementById('amd-user-menu-popup');
+                let hideMenuTimeout;
+        
+                // --- Logic for ALL users ---
                 function hideAllPopups() {
                     if(loggedOutBackdrop) loggedOutBackdrop.style.display = 'none';
-                    if(loggedInBackdrop) loggedInBackdrop.style.display = 'none';
+                    if(loggedInMenu) loggedInMenu.style.display = 'none';
                 }
-
-                trigger.addEventListener('click', e => {
-                    e.preventDefault();
-                    if (is_logged_in) {
-                        showPopup(loggedInBackdrop);
-                    } else {
-                        showPopup(loggedOutBackdrop);
-                    }
-                });
-
-                document.querySelectorAll('.amd-popup-backdrop').forEach(backdrop => {
-                    backdrop.addEventListener('click', e => { if (e.target === backdrop) hideAllPopups(); });
-                    backdrop.querySelector('#amd-popup-close')?.addEventListener('click', hideAllPopups);
-                });
-
+        
                 // --- Logged In Logic ---
-                if (is_logged_in && loggedInBackdrop) {
-                    loggedInBackdrop.querySelector('.Username').textContent = user_info.display_name;
-                    loggedInBackdrop.querySelector('.UsernameGmailCom').textContent = user_info.email;
-                    loggedInBackdrop.querySelector('a[data-link="admin"]').href = user_info.admin_url;
-                    loggedInBackdrop.querySelector('a[data-link="profile"]').href = user_info.profile_url;
-                    loggedInBackdrop.querySelector('a[data-link="logout"]').href = user_info.logout_url;
-                }
+                if (is_logged_in && loggedInMenu) {
+                    const avatar = loggedInMenu.querySelector('.amd-user-avatar');
+                    if(user_info.avatar_url) avatar.src = user_info.avatar_url;
 
+                    loggedInMenu.querySelector('.Username').textContent = user_info.display_name;
+                    loggedInMenu.querySelector('.UsernameGmailCom').textContent = user_info.email;
+
+                    const logoutLink = loggedInMenu.querySelector('a[data-link="logout"]');
+                    logoutLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const formData = new FormData();
+                        formData.append('action', 'amd_ajax_logout');
+                        formData.append('nonce', amd_popup_vars.logout_nonce);
+
+                        fetch(ajax_url, { method: 'POST', body: formData })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success) {
+                                    window.location.href = home_url;
+                                } else {
+                                    alert('登出失敗，請稍後再試。');
+                                }
+                            })
+                            .catch(() => alert('網路連線錯誤，請檢查您的網路。'));
+                    });
+        
+                    const showMenu = () => {
+                        clearTimeout(hideMenuTimeout);
+                        const rect = trigger.getBoundingClientRect();
+                        loggedInMenu.style.display = 'block';
+                        loggedInMenu.style.top = (window.scrollY + rect.bottom + 5) + 'px';
+                        loggedInMenu.style.left = (window.scrollX + rect.right - loggedInMenu.offsetWidth) + 'px';
+                    };
+        
+                    const startHideTimer = () => {
+                        hideMenuTimeout = setTimeout(() => {
+                            loggedInMenu.style.display = 'none';
+                        }, 300);
+                    };
+        
+                    trigger.addEventListener('mouseenter', showMenu);
+                    trigger.addEventListener('mouseleave', startHideTimer);
+                    loggedInMenu.addEventListener('mouseenter', () => clearTimeout(hideMenuTimeout));
+                    loggedInMenu.addEventListener('mouseleave', startHideTimer);
+                    trigger.addEventListener('click', e => e.preventDefault());
+        
+                } 
                 // --- Logged Out Logic ---
-                if (!is_logged_in && loggedOutBackdrop) {
+                else if (!is_logged_in && loggedOutBackdrop) {
+                    const closeBtn = loggedOutBackdrop.querySelector('#amd-popup-close');
                     const tabs = loggedOutBackdrop.querySelectorAll('.amd-popup-tab-btn');
                     const loginForm = document.getElementById('amd-login-form');
                     const registerForm = document.getElementById('amd-register-form');
                     const messageArea = loggedOutBackdrop.querySelector('.amd-popup-message-area');
                     const backLinks = loggedOutBackdrop.querySelectorAll('.amd-back-link');
-
-                    function showMessage(type, text) {
+        
+                    trigger.addEventListener('click', e => {
+                        e.preventDefault();
+                        loggedOutBackdrop.style.display = 'flex';
+                    });
+                    
+                    closeBtn.addEventListener('click', hideAllPopups);
+                    loggedOutBackdrop.addEventListener('click', e => { if (e.target === loggedOutBackdrop) hideAllPopups(); });
+        
+                    function showMessage(type, html) {
                         messageArea.className = 'amd-popup-message-area ' + type;
-                        messageArea.innerHTML = text;
+                        messageArea.innerHTML = html;
                         messageArea.style.display = 'block';
                     }
-
+        
                     function switchTab(tabName) {
                         tabs.forEach(tab => tab.classList.remove('active'));
                         loggedOutBackdrop.querySelector(`.amd-popup-tab-btn[data-tab="${tabName}"]`).classList.add('active');
@@ -234,20 +289,20 @@ if (!class_exists('AMD_Login_Popup_Manager')) {
                         registerForm.style.display = (tabName === 'register') ? 'block' : 'none';
                         messageArea.style.display = 'none';
                     }
-
+        
                     tabs.forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
                     backLinks.forEach(link => link.addEventListener('click', e => { e.preventDefault(); switchTab(link.dataset.tab); }));
-
+        
                     function handleFormSubmit(form, action) {
                         const submitBtn = form.querySelector('button[type="submit"]');
                         const originalBtnText = submitBtn.textContent;
                         submitBtn.textContent = originalBtnText + '中...';
                         submitBtn.disabled = true;
-
+        
                         const formData = new FormData(form);
                         formData.append('action', action);
                         formData.append('nonce', action === 'amd_ajax_login' ? login_nonce : register_nonce);
-
+        
                         fetch(ajax_url, { method: 'POST', body: formData })
                         .then(res => res.json())
                         .then(data => {
@@ -266,15 +321,15 @@ if (!class_exists('AMD_Login_Popup_Manager')) {
                             submitBtn.disabled = false;
                         });
                     }
-
+        
                     loginForm.addEventListener('submit', function(e) { e.preventDefault(); handleFormSubmit(this, 'amd_ajax_login'); });
                     registerForm.addEventListener('submit', function(e) { e.preventDefault(); handleFormSubmit(this, 'amd_ajax_register'); });
-
+        
                     if (google_login_html) {
                         loggedOutBackdrop.querySelector('#amd-register-google-placeholder').innerHTML = google_login_html;
                         loggedOutBackdrop.querySelector('#amd-login-google-placeholder').innerHTML = google_login_html;
                     }
-                    switchTab('register'); // Default to register tab
+                    switchTab('register');
                 }
             });
             </script>
@@ -286,7 +341,15 @@ if (!class_exists('AMD_Login_Popup_Manager')) {
             $creds = ['user_login' => $_POST['username'], 'user_password' => $_POST['password'], 'remember' => true];
             $user_signon = wp_signon($creds, true);
             if (is_wp_error($user_signon)) {
-                wp_send_json(['success' => false, 'message' => '登入失敗：帳號或密碼錯誤。']);
+                $email = esc_html($_POST['username']);
+                $forgot_password_url = esc_url(wp_lostpassword_url());
+                $email = esc_html($_POST['username']);
+                $forgot_password_url = esc_url(wp_lostpassword_url());
+                $message = '錯誤：為電子郵件地址 ' . 
+                    '<span>' . $email . '</span>' . 
+                    ' 所輸入的密碼不正確。 ' . 
+                    '<a href="' . $forgot_password_url . '">忘記密碼？</a>';
+                wp_send_json(['success' => false, 'message' => $message]);
             } else {
                 wp_send_json(['success' => true, 'message' => '登入成功！頁面即將跳轉...']);
             }
@@ -310,8 +373,15 @@ if (!class_exists('AMD_Login_Popup_Manager')) {
                 }
                 wp_set_current_user($user_id);
                 wp_set_auth_cookie($user_id);
-                wp_send_json(['success' => true, 'message' => '註冊成功！系統已為您自動登入，頁面即將跳轉...']);
+                wp_send_json(['success' => true, 'message' => '已成功建立您的帳號，您的詳細登入資訊已傳送到您的電子郵件地址。']);
             }
+        }
+
+        public static function ajax_logout_handler() {
+            check_ajax_referer('amd-logout-nonce', 'nonce');
+            wp_logout();
+            wp_send_json(['success' => true]);
+            exit();
         }
     }
     AMD_Login_Popup_Manager::init();
