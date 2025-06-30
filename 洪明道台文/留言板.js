@@ -202,59 +202,6 @@ jQuery(document).ready(function($) {
     });
     
     /**
-     * 頭像上傳功能
-     */
-    function initAvatarUpload() {
-        // 添加頭像上傳按鈕到用戶帳戶頁面
-        if ($('.woocommerce-MyAccount-content').length > 0) {
-            var uploadHTML = '<div class="angminde-avatar-upload">' +
-                '<h3>自訂頭像</h3>' +
-                '<input type="file" id="avatar-upload" accept="image/*" style="display:none;">' +
-                '<button type="button" id="upload-avatar-btn">上傳頭像</button>' +
-                '<div id="avatar-preview"></div>' +
-                '</div>';
-            
-            $('.woocommerce-MyAccount-content').prepend(uploadHTML);
-            
-            $('#upload-avatar-btn').on('click', function() {
-                $('#avatar-upload').click();
-            });
-            
-            $('#avatar-upload').on('change', function() {
-                var file = this.files[0];
-                if (file) {
-                    var formData = new FormData();
-                    formData.append('avatar', file);
-                    formData.append('action', 'upload_avatar');
-                    formData.append('nonce', angminde_ajax.nonce);
-                    
-                    $.ajax({
-                        url: angminde_ajax.ajax_url,
-                        type: 'POST',
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            if (response.success) {
-                                $('#avatar-preview').html('<img src="' + response.data.avatar_url + '" style="width:100px;height:100px;border-radius:50%;">');
-                                alert('頭像上傳成功！');
-                            } else {
-                                alert('上傳失敗：' + response.data);
-                            }
-                        },
-                        error: function() {
-                            alert('上傳失敗，請稍後再試');
-                        }
-                    });
-                }
-            });
-        }
-    }
-    
-    // 初始化頭像上傳功能
-    initAvatarUpload();
-    
-    /**
      * 滾動載入動畫
      */
     function animateOnScroll() {

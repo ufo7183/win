@@ -17,8 +17,7 @@ class AngmindeMessageBoard {
         add_action('wp_ajax_nopriv_like_comment', array($this, 'handle_like_comment'));
         add_action('wp_ajax_add_comment', array($this, 'handle_add_comment'));
         add_action('wp_ajax_nopriv_add_comment', array($this, 'handle_add_comment'));
-        add_action('wp_ajax_upload_avatar', array($this, 'handle_upload_avatar'));
-        add_action('wp_ajax_nopriv_upload_avatar', array($this, 'handle_upload_avatar'));
+
         
         // 註冊Shortcode
         add_shortcode('angminde_message_board', array($this, 'render_message_board'));
@@ -459,13 +458,9 @@ class AngmindeMessageBoard {
      * 獲取用戶頭像
      */
     private function get_user_avatar($user_id) {
-        $custom_avatar = get_user_meta($user_id, 'angminde_custom_avatar', true);
-        if ($custom_avatar) {
-            return $custom_avatar;
-        }
-        
-        // 預設頭像
-        return 'https://angminde.tw/wp-content/uploads/2025/06/member-1-e1749619728735.png';
+        // 直接使用WordPress預設頭像或指定的預設圖片
+        $avatar_url = get_avatar_url($user_id);
+        return $avatar_url ? $avatar_url : 'https://angminde.tw/wp-content/uploads/2025/06/member-e1749126026306.png';
     }
     
     /**
@@ -509,29 +504,6 @@ class AngmindeMessageBoard {
             "SELECT COUNT(*) FROM $table_name WHERE parent_id = %d AND status = 'published'",
             $message_id
         ));
-    }
-    
-    /**
-     * 處理頭像上傳
-     */
-    public function handle_upload_avatar() {
-        // 驗證nonce和登入狀態
-        if (!wp_verify_nonce($_POST['nonce'], 'angminde_nonce') || !is_user_logged_in()) {
-            wp_send_json_error('權限不足');
-        }
-        
-        if (!function_exists('wp_handle_upload')) {
-            require_once(ABSPATH . 'wp-admin/includes/file.php');
-        }
-        
-        $upload = wp_handle_upload($_FILES['avatar'], array('test_form' => false));
-        
-        if ($upload && !isset($upload['error'])) {
-            update_user_meta(get_current_user_id(), 'angminde_custom_avatar', $upload['url']);
-            wp_send_json_success(array('avatar_url' => $upload['url']));
-        } else {
-            wp_send_json_error('上傳失敗：' . $upload['error']);
-        }
     }
 }
 
