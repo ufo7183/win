@@ -6,14 +6,14 @@
     text-align: center;
 }
 
-/* 外層 .clinic-filter-container：上方篩選區塊 */
-.myplugin-wrapper .clinic-filter-container {
+/* 外層 .store-filter-container：上方篩選區塊 */
+.myplugin-wrapper .store-filter-container {
     margin-bottom: 30px;
 }
 
 /* 大螢幕 (>700px) */
 @media (min-width: 700px) {
-    .myplugin-wrapper .clinic-filter-row {
+    .myplugin-wrapper .store-filter-row {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -25,7 +25,7 @@
 
 /* 小螢幕 (<=700px) */
 @media (max-width: 700px) {
-    .myplugin-wrapper .clinic-filter-row {
+    .myplugin-wrapper .store-filter-row {
         width: 100%;
         margin: 0 auto;
         display: flex;
@@ -36,7 +36,7 @@
 }
 
 /* ========== 下拉選單樣式 ========== */
-.myplugin-wrapper .clinic-filter-field select {
+.myplugin-wrapper .store-filter-field select {
     display: block;
     font-size: 16px;
     line-height: 25.6px;
@@ -119,21 +119,21 @@
 }
 
 /* =========== 列表區 =========== */
-.myplugin-wrapper .clinic-list-container {
+.myplugin-wrapper .store-list-container {
     width: 1140px;
     max-width: 100%;
     margin: 0 auto;
     text-align: left;
 }
 
-.myplugin-wrapper .clinic-initial-message {
+.myplugin-wrapper .store-initial-message {
     color: #033473;
     font-size: 20px;
     padding: 20px;
     text-align: center;
 }
 
-.myplugin-wrapper .clinic-item {
+.myplugin-wrapper .store-item {
     display: flex;
     flex-wrap: wrap;
     margin-bottom: 30px;
@@ -142,37 +142,37 @@
 }
 
 @media (max-width: 700px) {
-    .myplugin-wrapper .clinic-item {
+    .myplugin-wrapper .store-item {
         display: block;
     }
 }
 
-.myplugin-wrapper .clinic-title {
+.myplugin-wrapper .store-title {
     flex: 0 0 40%;
     font-size: 18px;
     line-height: 28.8px;
     transition: color 0.3s;
     margin-bottom:0;
 }
-.myplugin-wrapper .clinic-title a {
+.myplugin-wrapper .store-title a {
     color: #333;
     text-decoration: none;
 }
-.myplugin-wrapper .clinic-title a:hover {
+.myplugin-wrapper .store-title a:hover {
     color: #1D6579;
 }
-.myplugin-wrapper .clinic-address {
+.myplugin-wrapper .store-address {
     flex: 0 0 40%;
     font-size: 18px;
     line-height: 28.8px;
 }
-.myplugin-wrapper .clinic-address a {
+.myplugin-wrapper .store-address a {
     color: #2b6cb0;
 }
-.myplugin-wrapper .clinic-phone a {
+.myplugin-wrapper .store-phone a {
     color: #2b6cb0;
 }
-.myplugin-wrapper .clinic-phone {
+.myplugin-wrapper .store-phone {
     flex: 0 0 20%;
     font-size: 18px;
     line-height: 28.8px;
