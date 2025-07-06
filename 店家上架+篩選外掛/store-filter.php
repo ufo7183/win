@@ -88,9 +88,9 @@ if (!function_exists('store_filter_enqueue_scripts')) {
     add_action('wp_enqueue_scripts', 'store_filter_enqueue_scripts', 999);
 }
 
-// 4. 短代碼：搜尋表單
-if (!function_exists('store_search_bar_shortcode')) {
-    function store_search_bar_shortcode($atts) {
+// 4. 短代碼：店家篩選器 (合併表單與列表)
+if (!function_exists('store_filter_shortcode')) {
+    function store_filter_shortcode() {
         $cities = get_terms(array(
             'taxonomy'   => 'store_location',
             'parent'     => 0,
@@ -98,181 +98,113 @@ if (!function_exists('store_search_bar_shortcode')) {
         ));
         ob_start();
         ?>
-<div class="myplugin-wrapper">
-    <div class="store-filter-container">
-        <form id="store-filter-form">
-            <div class="store-filter-row">
-                <!-- 縣市 -->
-                <div class="store-filter-field city">
-                    <select id="store_city" name="store_city">
-                        <option value="">選擇縣市</option>
-                        <?php if ($cities && !is_wp_error($cities)) : ?>
-                            <?php foreach($cities as $city) : ?>
-                                <option value="<?php echo esc_attr($city->term_id); ?>">
-                                    <?php echo esc_html($city->name); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </select>
-                </div>
-                <!-- 區域 -->
-                <div class="store-filter-field area">
-                    <select id="store_area" name="store_area" disabled>
-                        <option value="">選擇區域</option>
-                    </select>
-                </div>
-                <!-- 搜尋關鍵字 -->
-                <div class="search-box">
-                    <div class="ser-box">
-                        <i class="fa fa-search search-icon"></i>
-                        <input type="text" id="store_keyword" placeholder="搜尋店家名稱" />
-                        <button type="submit" id="store-filter-submit" class="button">搜尋</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
+        <div class="store-filter-wrapper">
+            <form id="store-filter-form">
+                <select id="store_city" name="city">
+                    <option value="">選擇縣市</option>
+                    <?php foreach($cities as $city) : ?>
+                        <option value="<?php echo esc_attr($city->term_id); ?>"><?php echo esc_html($city->name); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <select id="store_area" name="area" disabled>
+                    <option value="">選擇區域</option>
+                </select>
+                <input type="text" id="store_keyword" name="keyword" placeholder="搜尋店家名稱" />
+                <button type="submit">搜尋</button>
+            </form>
+            <div id="store-list-results" class="store-list"></div>
+            <div id="store-list-pagination"></div>
+        </div>
         <?php
         return ob_get_clean();
     }
-    add_shortcode('store_search_bar', 'store_search_bar_shortcode');
+    add_shortcode('store_filter', 'store_filter_shortcode');
 }
 
-// 5. 短代碼：店家列表
-if (!function_exists('store_list_shortcode')) {
-    function store_list_shortcode($atts) {
-        ob_start();
-        ?>
-<div class="myplugin-wrapper">
-    <div id="store-list-container" class="store-list-container">
-        <div class="store-initial-message">搜尋您附近的認證店家</div>
-    </div>
-    <button id="load-more" class="load-more hidden">載入更多</button>
-</div>
-        <?php
-        return ob_get_clean();
-    }
-    add_shortcode('store_list', 'store_list_shortcode');
-}
+// 6. AJAX Handler for Filtering and Pagination
+if (!function_exists('store_filter_ajax_handler')) {
+    function store_filter_ajax_handler() {
+        check_ajax_referer('store_filter_nonce', 'nonce');
 
-// 6. 產生列表 HTML
-if (!function_exists('store_filter_generate_list')) {
-    function store_filter_generate_list($city_id = 0, $area_id = 0, $keyword = '', $offset = 0) {
+        $paged = isset($_POST['paged']) ? intval($_POST['paged']) : 1;
+        $city_id = isset($_POST['city']) ? intval($_POST['city']) : 0;
+        $area_id = isset($_POST['area']) ? intval($_POST['area']) : 0;
+        $keyword = isset($_POST['keyword']) ? sanitize_text_field($_POST['keyword']) : '';
+
         $args = array(
-            'post_type'      => 'store',
-            'posts_per_page' => 25,
-            'offset'         => $offset
+            'post_type' => 'store',
+            'posts_per_page' => 15,
+            'paged' => $paged,
+            's' => $keyword,
         );
 
-        // tax query
-        $tax_query = array();
+        $tax_query = array('relation' => 'AND');
         if (!empty($area_id)) {
-            // 如果有選擇區域，直接用區域ID查詢
-            $tax_query[] = array(
-                'taxonomy' => 'store_location',
-                'field'    => 'term_id',
-                'terms'    => $area_id
-            );
+            $tax_query[] = array('taxonomy' => 'store_location', 'field' => 'term_id', 'terms' => $area_id);
         } elseif (!empty($city_id)) {
-            // 如果只選擇縣市，則查詢該縣市以及其下所有區域
-            $child_terms = get_terms(array(
-                'taxonomy'  => 'store_location',
-                'parent'    => $city_id,
-                'fields'    => 'ids',
-                'hide_empty'=> false
-            ));
-
-            $terms_to_query = array($city_id); // 將城市ID加入查詢
-            if (!is_wp_error($child_terms) && !empty($child_terms)) {
-                $terms_to_query = array_merge($terms_to_query, $child_terms); // 合併子區域ID
-            }
-
-            $tax_query[] = array(
-                'taxonomy' => 'store_location',
-                'field'    => 'term_id',
-                'terms'    => $terms_to_query,
-                'operator' => 'IN'
-            );
+            $child_terms = get_terms(array('taxonomy' => 'store_location', 'parent' => $city_id, 'fields' => 'ids', 'hide_empty' => false));
+            $terms_to_query = array_merge(array($city_id), $child_terms);
+            $tax_query[] = array('taxonomy' => 'store_location', 'field' => 'term_id', 'terms' => $terms_to_query, 'operator' => 'IN');
         }
 
-        if (!empty($tax_query)) {
+        if (count($tax_query) > 1) { // Only add tax_query if there's something to query
             $args['tax_query'] = $tax_query;
         }
 
-        // 關鍵字
-        if (!empty($keyword)) {
-            $args['s'] = sanitize_text_field($keyword);
-        }
-
-        // --- Test/Debug Function ---
-        // 當 WP_DEBUG 啟用時，這段程式碼會將查詢參數記錄到 debug.log
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('--- Store Filter Debug ---');
-            error_log('Query Args: ' . print_r($args, true));
+            error_log('Store Filter Query Args: ' . print_r($args, true));
         }
-        // --- End Test/Debug Function ---
 
         $query = new WP_Query($args);
-        // 計算總量
-        $total_query = new WP_Query(array_merge($args, array('posts_per_page' => -1)));
-        $total = $total_query->post_count;
+        $html = '';
 
-        if (!$query->have_posts()) {
-            return array('success' => false);
-        }
+        if ($query->have_posts()) {
+            while ($query->have_posts()) {
+                $query->the_post();
+                $store_image = get_field('store_image');
+                $store_phone = get_field('store_phone');
+                $store_address = get_field('store_address');
+                $bg_image_style = $store_image ? 'style="background-image: url(' . esc_url($store_image['url']) . ');"' : '';
 
-        ob_start();
-        while ($query->have_posts()) {
-            $query->the_post();
-            $address      = get_field('store_address') ?: '';
-            $address_url  = get_field('store_address_url') ?: '';
-            $phone        = get_field('store_phone') ?: '';
-            $phone_url    = get_field('store_phone_url') ?: '';
-            ?>
-            <div class="store-item">
-                <h3 class="store-title">
-                    <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-                </h3>
-                <div class="store-address">
-                    <?php if($address_url): ?>
-                        <a href="<?php echo esc_url($address_url); ?>" target="_blank">
-                            <?php echo esc_html($address); ?>
-                        </a>
-                    <?php else: ?>
-                        <?php echo esc_html($address); ?>
-                    <?php endif; ?>
-                </div>
-                <div class="store-phone">
-                    <?php if($phone_url): ?>
-                        <a href="<?php echo esc_url($phone_url); ?>">
-                            <?php echo esc_html($phone); ?>
-                        </a>
-                    <?php else: ?>
-                        <?php echo esc_html($phone); ?>
-                    <?php endif; ?>
-                </div>
-            </div>
-            <?php
+                $html .= '<div class="store-item" ' . $bg_image_style . '>';
+                $html .= '  <div class="store-item-content">';
+                $html .= '    <div class="store-item-name">' . get_the_title() . '</div>';
+                if ($store_phone) {
+                     $html .= '    <div class="store-item-phone">TEL：' . esc_html($store_phone) . '</div>';
+                }
+                if ($store_address) {
+                    $html .= '    <div class="store-item-address">地址：' . esc_html($store_address) . '</div>';
+                }
+                $html .= '  </div>';
+                $html .= '</div>';
+            }
+        } else {
+            $html = '<p class="no-results">沒有找到符合條件的店家。</p>';
         }
         wp_reset_postdata();
 
-        $html = ob_get_clean();
+        $pagination_html = paginate_links(array(
+            'base' => '%_%',
+            'format' => '?paged=%#%',
+            'current' => max(1, $paged),
+            'total' => $query->max_num_pages,
+            'prev_next' => true,
+            'prev_text' => '«',
+            'next_text' => '»',
+            'type' => 'plain',
+        ));
 
-        return array(
-            'success' => true,
-            'data' => array(
-                'html'  => $html,
-                'total' => $total
-            )
-        );
+        wp_send_json_success(array('html' => $html, 'pagination' => $pagination_html));
+        wp_die();
     }
+    add_action('wp_ajax_store_filter', 'store_filter_ajax_handler');
+    add_action('wp_ajax_nopriv_store_filter', 'store_filter_ajax_handler');
 }
 
 // 7. AJAX：取得子區域
 if (!function_exists('store_filter_get_districts_ajax')) {
     function store_filter_get_districts_ajax() {
-        check_ajax_referer('store_filter_nonce', 'security');
+        check_ajax_referer('store_filter_nonce', 'nonce'); // Changed from 'security'
         $city_id = isset($_POST['city_id']) ? intval($_POST['city_id']) : 0;
         $data = array();
 
@@ -284,10 +216,7 @@ if (!function_exists('store_filter_get_districts_ajax')) {
             ));
             if (!is_wp_error($terms) && !empty($terms)) {
                 foreach ($terms as $t) {
-                    $data[] = array(
-                        'term_id' => $t->term_id,
-                        'name'    => $t->name
-                    );
+                    $data[] = array('term_id' => $t->term_id, 'name' => $t->name);
                 }
             }
         }
@@ -296,28 +225,6 @@ if (!function_exists('store_filter_get_districts_ajax')) {
     }
     add_action('wp_ajax_store_filter_get_districts','store_filter_get_districts_ajax');
     add_action('wp_ajax_nopriv_store_filter_get_districts','store_filter_get_districts_ajax');
-}
-
-// 8. AJAX：篩選
-if (!function_exists('store_filter_ajax_search')) {
-    function store_filter_ajax_search() {
-        check_ajax_referer('store_filter_nonce','security');
-        $city_id = isset($_POST['city_id']) ? intval($_POST['city_id']) : 0;
-        $area_id = isset($_POST['area_id']) ? intval($_POST['area_id']) : 0;
-        $keyword = isset($_POST['keyword']) ? sanitize_text_field($_POST['keyword']) : '';
-        $offset  = isset($_POST['offset']) ? intval($_POST['offset']) : 0;
-
-        $result = store_filter_generate_list($city_id, $area_id, $keyword, $offset);
-
-        if($result['success']) {
-            wp_send_json_success($result['data']);
-        } else {
-            wp_send_json_error();
-        }
-        wp_die();
-    }
-    add_action('wp_ajax_store_filter','store_filter_ajax_search');
-    add_action('wp_ajax_nopriv_store_filter','store_filter_ajax_search');
 }
 
 // 9. 後台：載入後台專用 JS & CSS
