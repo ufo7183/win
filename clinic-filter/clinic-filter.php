@@ -308,3 +308,36 @@ if (!function_exists('clinic_filter_ajax_search')) {
     add_action('wp_ajax_clinic_filter','clinic_filter_ajax_search');
     add_action('wp_ajax_nopriv_clinic_filter','clinic_filter_ajax_search');
 }
+
+// 9. 後台：載入後台專用 JS & CSS
+if (!function_exists('clinic_filter_admin_enqueue_scripts')) {
+    function clinic_filter_admin_enqueue_scripts($hook) {
+        global $post;
+
+        // 只在編輯「診所」文章類型的頁面載入
+        if ($hook == 'post.php' || $hook == 'post-new.php') {
+            if (isset($post->post_type) && $post->post_type === 'clinic') {
+                // 載入 Dashicons (收合圖示需要)
+                wp_enqueue_style('dashicons');
+
+                // 載入後台 CSS
+                wp_enqueue_style(
+                    'clinic-admin-style',
+                    plugins_url('assets/css/clinic-admin.css', __FILE__),
+                    array(),
+                    '1.0'
+                );
+
+                // 載入後台 JS
+                wp_enqueue_script(
+                    'clinic-admin-script',
+                    plugins_url('assets/js/clinic-admin.js', __FILE__),
+                    array('jquery'),
+                    '1.0',
+                    true
+                );
+            }
+        }
+    }
+    add_action('admin_enqueue_scripts', 'clinic_filter_admin_enqueue_scripts');
+}
