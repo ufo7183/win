@@ -1,0 +1,200 @@
+/* =========== 全域容器 =========== */
+.myplugin-wrapper {
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+/* 外層 .clinic-filter-container：上方篩選區塊 */
+.myplugin-wrapper .clinic-filter-container {
+    margin-bottom: 30px;
+}
+
+/* 大螢幕 (>700px) */
+@media (min-width: 700px) {
+    .myplugin-wrapper .clinic-filter-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 680px;
+        margin: 0 auto;
+    }
+}
+
+/* 小螢幕 (<=700px) */
+@media (max-width: 700px) {
+    .myplugin-wrapper .clinic-filter-row {
+        width: 100%;
+        margin: 0 auto;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+}
+
+/* ========== 下拉選單樣式 ========== */
+.myplugin-wrapper .clinic-filter-field select {
+    display: block;
+    font-size: 16px;
+    line-height: 25.6px;
+    padding: 5px 35px 5px 10px;
+    border: none !important;
+    border-radius: 8px;
+    background-color: #fff;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* 大螢幕 */
+@media (min-width: 700px) {
+    .myplugin-wrapper .city, .myplugin-wrapper .area {
+        width: 200px;
+    }
+}
+
+/* 小螢幕 */
+@media (max-width: 700px) {
+    .myplugin-wrapper .city, .myplugin-wrapper .area {
+        width: calc(50% - 10px);
+    }
+}
+
+/* ========== 搜尋區塊(搜尋欄+按鈕) ========== */
+.myplugin-wrapper .search-box {
+    width: 100%;
+}
+@media (min-width: 700px) {
+    .myplugin-wrapper .search-box {
+        flex: 1;
+        max-width: 400px;
+    }
+}
+
+/* 膠囊 */
+.myplugin-wrapper .ser-box {
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 40px;
+    overflow: hidden;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+/* 放大鏡圖示 */
+.myplugin-wrapper .search-icon {
+    font-size: 18px;
+    color: #666;
+    margin-left: 10px;
+    margin-right: 8px;
+}
+
+/* 搜尋輸入 */
+.myplugin-wrapper .ser-box input[type="text"] {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: 16px;
+    line-height: 25.6px;
+    background: transparent;
+    padding: 5px 10px;
+}
+
+/* 按鈕 */
+.myplugin-wrapper .ser-box .button {
+    background: #033473;
+    color: #fff;
+    border: none;
+    padding: 8px 25px;
+    font-size: 18px;
+    line-height: 28.8px;
+    border-radius: 40px;
+    cursor: pointer;
+    white-space: nowrap;
+    z-index: 10;
+}
+
+/* =========== 列表區 =========== */
+.myplugin-wrapper .clinic-list-container {
+    width: 1140px;
+    max-width: 100%;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.myplugin-wrapper .clinic-initial-message {
+    color: #033473;
+    font-size: 20px;
+    padding: 20px;
+    text-align: center;
+}
+
+.myplugin-wrapper .clinic-item {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+@media (max-width: 700px) {
+    .myplugin-wrapper .clinic-item {
+        display: block;
+    }
+}
+
+.myplugin-wrapper .clinic-title {
+    flex: 0 0 40%;
+    font-size: 18px;
+    line-height: 28.8px;
+    transition: color 0.3s;
+    margin-bottom:0;
+}
+.myplugin-wrapper .clinic-title a {
+    color: #333;
+    text-decoration: none;
+}
+.myplugin-wrapper .clinic-title a:hover {
+    color: #1D6579;
+}
+.myplugin-wrapper .clinic-address {
+    flex: 0 0 40%;
+    font-size: 18px;
+    line-height: 28.8px;
+}
+.myplugin-wrapper .clinic-address a {
+    color: #2b6cb0;
+}
+.myplugin-wrapper .clinic-phone a {
+    color: #2b6cb0;
+}
+.myplugin-wrapper .clinic-phone {
+    flex: 0 0 20%;
+    font-size: 18px;
+    line-height: 28.8px;
+}
+.myplugin-wrapper .no-results {
+    padding: 30px;
+    text-align: center;
+    font-size: 18px;
+    background: #f9f9f9;
+    border-radius: 4px;
+}
+.myplugin-wrapper .load-more {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 30px;
+    background: #033473;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+.myplugin-wrapper .load-more.hidden {
+    display: none;
+}
