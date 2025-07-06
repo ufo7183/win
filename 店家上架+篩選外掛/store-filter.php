@@ -1,9 +1,12 @@
 <?php
 /*
 Plugin Name: store Filter
-Version: 1.0
+Version: 1.4
 Author: Your Name
 */
+
+// Include ACF fields
+require_once plugin_dir_path(__FILE__) . 'acf-fields.php';
 
 if (!defined('ABSPATH')) exit;
 
