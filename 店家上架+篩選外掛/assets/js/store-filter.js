@@ -46,19 +46,23 @@ jQuery(function($) {
 
     // --- EVENT HANDLERS ---
 
-    // 1. Handle filter form submission
+    // 1. Handle form submission (for keyword search)
     $('#store-filter-form').on('submit', function(e) {
-        e.preventDefault();
-        fetchStores(1); // On any new filter, go back to page 1
+        e.preventDefault(); // Prevent full page reload
+        fetchStores(1);
     });
 
-    // 2. Handle pagination clicks (uses event delegation)
+    // 2. Handle instant filtering for dropdowns
+    $('#store-filter-form').on('change', 'select', function() {
+        fetchStores(1);
+    });
+
+    // 3. Handle pagination clicks (uses event delegation)
     $('#store-list-pagination').on('click', 'a.page-numbers', function(e) {
         e.preventDefault();
         const href = $(this).attr('href');
         let page = 1;
 
-        // Extract page number from URL (e.g., ?paged=2)
         const match = href.match(/paged=(\d+)/);
         if (match) {
             page = parseInt(match[1], 10);
@@ -67,7 +71,7 @@ jQuery(function($) {
         fetchStores(page);
     });
 
-    // 3. Handle city change to populate areas
+    // 4. Handle city change to populate areas
     $('#store_city').on('change', function() {
         const city_id = $(this).val();
         const areaSelect = $('#store_area');
@@ -75,15 +79,18 @@ jQuery(function($) {
         areaSelect.html('<option value="">選擇區域</option>').prop('disabled', true);
 
         if (!city_id) {
-            return; // Do nothing if 'Select City' is chosen
+            // If city is cleared, still trigger a filter refresh
+            fetchStores(1);
+            return;
         }
 
+        // Fetch child areas
         $.ajax({
             url: storeAjax.ajaxurl,
             type: 'POST',
             data: {
                 action: 'store_filter_get_districts',
-                nonce: storeAjax.nonce, // Note: The PHP handler uses 'store_filter_nonce'
+                nonce: storeAjax.nonce,
                 city_id: city_id
             },
             success: function(response) {
@@ -92,7 +99,9 @@ jQuery(function($) {
                     $.each(response.data, function(i, item) {
                         areaSelect.append(new Option(item.name, item.term_id));
                     });
-                } 
+                }
+                // This AJAX call doesn't trigger fetchStores directly,
+                // because the main 'change' handler for the form already does.
             }
         });
     });
