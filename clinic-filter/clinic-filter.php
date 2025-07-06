@@ -165,25 +165,32 @@ if (!function_exists('clinic_filter_generate_list')) {
         // tax query
         $tax_query = array();
         if (!empty($area_id)) {
+            // 如果有選擇區域，直接用區域ID查詢
             $tax_query[] = array(
                 'taxonomy' => 'clinic_location',
                 'field'    => 'term_id',
                 'terms'    => $area_id
             );
         } elseif (!empty($city_id)) {
+            // 如果只選擇縣市，則查詢該縣市以及其下所有區域
             $child_terms = get_terms(array(
                 'taxonomy'  => 'clinic_location',
                 'parent'    => $city_id,
                 'fields'    => 'ids',
                 'hide_empty'=> false
             ));
+
+            $terms_to_query = array($city_id); // 將城市ID加入查詢
             if (!is_wp_error($child_terms) && !empty($child_terms)) {
-                $tax_query[] = array(
-                    'taxonomy' => 'clinic_location',
-                    'field'    => 'term_id',
-                    'terms'    => $child_terms
-                );
+                $terms_to_query = array_merge($terms_to_query, $child_terms); // 合併子區域ID
             }
+
+            $tax_query[] = array(
+                'taxonomy' => 'clinic_location',
+                'field'    => 'term_id',
+                'terms'    => $terms_to_query,
+                'operator' => 'IN'
+            );
         }
 
         if (!empty($tax_query)) {
