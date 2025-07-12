@@ -1,0 +1,171 @@
+/*
+ * Store Filter Plugin Frontend Styles
+ * Version: 1.1
+ */
+
+/* --- Main Wrapper --- */
+.store-filter-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Noto Sans TC', sans-serif;
+}
+
+/* --- Filter Form --- */
+#store-filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+#store-filter-form select,
+#store-filter-form input[type="text"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    min-width: 180px;
+}
+
+#store-filter-form button {
+    padding: 10px 25px;
+    border: none;
+    background-color: #033473; /* Using a color from the old design */
+    color: #fff;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* --- Results Area --- */
+.store-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    min-height: 300px; /* Avoid layout shift while loading */
+}
+
+/* --- Store Item Card --- */
+.store-item {
+    width: 100%;
+    height: 300px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-color: #444; /* Fallback color */
+    color: #fcfcfc;
+    border-radius: 8px;
+    overflow: hidden;
+    text-align: center;
+}
+
+/* Dark Overlay */
+.store-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(42, 36, 38, 0.6);
+    z-index: 1;
+    transition: background-color 0.3s ease;
+}
+
+.store-item:hover::before {
+    background-color: rgba(42, 36, 38, 0.4);
+}
+
+/* Content container */
+.store-item-content {
+    position: relative;
+    z-index: 2; /* Puts content above the overlay */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
+
+.store-item-name {
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: 3.6px;
+    color: #FCFCFC;
+}
+
+.store-item-phone,
+.store-item-address {
+    font-size: 14px;
+    font-weight: 350;
+    line-height: 1.5;
+    letter-spacing: 2.1px;
+    color: rgba(251, 251, 251, 0.85);
+    word-wrap: break-word;
+}
+
+.store-item-address {
+    max-width: 261px;
+    margin: 0 auto;
+}
+
+/* --- No Results Message --- */
+.no-results {
+    grid-column: 1 / -1; /* Span all columns */
+    text-align: center;
+    padding: 50px 20px;
+    font-size: 18px;
+    color: #666;
+}
+
+/* --- Pagination --- */
+#store-list-pagination {
+    margin-top: 40px;
+    text-align: center;
+}
+
+#store-list-pagination .page-numbers {
+    display: inline-block;
+    padding: 8px 15px;
+    margin: 0 4px;
+    border: 1px solid #ddd;
+    color: #333;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+#store-list-pagination .page-numbers.current,
+#store-list-pagination .page-numbers:hover {
+    background-color: #033473;
+    color: #fff;
+    border-color: #033473;
+}
+
+/* --- Responsive --- */
+@media (max-width: 992px) {
+    .store-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 767px) {
+    .store-list {
+        grid-template-columns: 1fr;
+    }
+    #store-filter-form {
+        flex-direction: column;
+    }
+    #store-filter-form select,
+    #store-filter-form input[type="text"] {
+        width: 100%;
+    }
+}

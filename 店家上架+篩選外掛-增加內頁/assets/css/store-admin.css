@@ -1,0 +1,11 @@
+#store_locationchecklist .toggle-children {
+    cursor: pointer;
+    margin-right: 5px;
+    vertical-align: middle;
+    color: #555d66;
+    transition: transform 0.2s ease-in-out;
+}
+
+#store_locationchecklist .toggle-children:hover {
+    color: #0073aa;
+}
