@@ -1,0 +1,116 @@
+/* 店家內頁樣式 */
+.store-single-container {
+    max-width: 1140px; /* 設置最大寬度為 1140px */
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 頁面頂部區域 */
+.top-section {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+/* 左側欄位 - 店家資訊 */
+.left-column {
+    flex: 1;
+}
+
+/* 右側欄位 - 地圖 */
+.right-column {
+    width: 400px;
+}
+
+/* 店家名稱樣式 */
+.entry-title {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* 店家資訊區塊 */
+.store-info-section {
+    margin-bottom: 30px;
+}
+
+.store-info-section h2 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #033473;
+}
+
+.store-info-section p {
+    margin-bottom: 15px;
+    font-size: 16px;
+    color: #666;
+}
+
+/* 地圖容器 */
+.google-map-container {
+    width: 100%;
+    height: 450px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* 資訊區塊樣式 */
+.store-information {
+    margin-top: 40px;
+}
+
+.store-information h2 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #033473;
+}
+
+.store-information .entry-content {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #666;
+}
+
+/* 響應式設計 */
+@media (max-width: 1200px) {
+    .right-column {
+        width: 350px;
+    }
+}
+
+@media (max-width: 992px) {
+    .top-section {
+        flex-direction: column;
+    }
+    
+    .right-column {
+        width: 100%;
+        margin-top: 30px;
+    }
+    
+    .google-map-container {
+        height: 350px;
+    }
+}
+
+@media (max-width: 768px) {
+    .store-single-container {
+        padding: 15px;
+    }
+    
+    .entry-title {
+        font-size: 24px;
+    }
+    
+    .store-info-section h2 {
+        font-size: 20px;
+    }
+    
+    .store-information h2 {
+        font-size: 20px;
+    }
+}
