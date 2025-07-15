@@ -18,7 +18,8 @@ get_header(); ?>
             $store_contact_person = get_field('store_contact_person');
             $store_business_hours = get_field('store_business_hours');
             $store_information = get_field('store_information');
-            $google_maps_api_key = 'YOUR_GOOGLE_MAPS_API_KEY'; // <-- 請在這裡填入您的 Google Maps API 金鑰
+            $store_map_embed = get_field('store_map_embed');
+            // 地圖嵌入代碼將直接從後台獲取
 
             ?>
 
@@ -51,19 +52,17 @@ get_header(); ?>
 
                     </div>
                     <div class="right-column">
-                        <?php if ( $store_address ) : ?>
-                            <div class="google-map-container">
-                                <iframe
-                                    src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3615.142248121051!2d121.517036!3d25.032969!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3442a85a80000001%3A0x7c2176d9e83f3f39!2z5L2g5aWz6aKY5YyX5YyX!5e0!3m2!1szh-TW!2stw!4v1694583999851!5m2!1szh-TW!2stw"
-                                    width="100%"
-                                    height="450"
-                                    style="border:0;"
-                                    allowfullscreen=""
-                                    loading="lazy">
-                                </iframe>
+                        <?php if ( !empty($store_map_embed) ) : ?>
+                            <div class="google-map-container" style="width: 100%; height: 450px;">
+                                <?php 
+                                // 直接輸出 iframe 代碼
+                                echo $store_map_embed;
+                                ?>
                             </div>
                         <?php else : ?>
-                            <p style="color: red;">請在店家文章中填寫地址。</p>
+                            <div style="background: #f5f5f5; padding: 20px; text-align: center; height: 200px; display: flex; align-items: center; justify-content: center;">
+                                <p style="color: #666; margin: 0;">尚未設置地圖</p>
+                            </div>
                         <?php endif; ?>
                     </div>
                 </div>

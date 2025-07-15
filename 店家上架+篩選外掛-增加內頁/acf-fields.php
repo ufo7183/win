@@ -24,6 +24,15 @@ acf_add_local_field_group(array(
             'type' => 'text',
         ),
         array(
+            'key' => 'field_store_map_embed',
+            'label' => '地圖嵌入代碼',
+            'name' => 'store_map_embed',
+            'type' => 'textarea',
+            'instructions' => '請在 Google Maps 中找到店家位置，點擊分享按鈕，選擇「嵌入地圖」，複製 iframe 代碼並貼在這裡。',
+            'rows' => 4,
+            'placeholder' => '<iframe src="https://www.google.com/maps/embed?..." width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>',
+        ),
+        array(
             'key' => 'field_store_business_hours',
             'label' => '營業時間',
             'name' => 'store_business_hours',
