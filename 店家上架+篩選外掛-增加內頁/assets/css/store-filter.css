@@ -11,42 +11,55 @@
     font-family: 'Noto Sans TC', sans-serif;
 }
 
-/* --- Filter Form --- */
-#store-filter-form {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 30px;
+/* 篩選容器樣式 */
+#store-filter-container {
+    max-width: 1140px; /* 設置最大寬度為 1140px */
+    margin: 0 auto;
+    padding: 20px;
 }
 
+/* 篩選表單樣式 */
+#store-filter-form {
+    display: flex;
+    flex-wrap: nowrap; /* 確保在電腦和平板版面上不換行 */
+    justify-content: flex-start; /* 項目靠左排列 */
+    gap: 15px;
+    margin-bottom: 30px;
+    flex: 1; /* 確保表單佔滿可用空間 */
+}
+
+/* 篩選表單元素樣式 */
 #store-filter-form select,
 #store-filter-form input[type="text"] {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
     min-width: 180px;
+    max-width: 200px; /* 設置最大寬度避免過寬 */
 }
 
+/* 篩選按鈕樣式 */
 #store-filter-form button {
     padding: 10px 25px;
     border: none;
-    background-color: #033473; /* Using a color from the old design */
+    background-color: #033473; /* 使用深藍色作為主要顏色 */
     color: #fff;
     cursor: pointer;
     border-radius: 5px;
     font-size: 16px;
+    white-space: nowrap; /* 防止文字換行 */
 }
 
-/* --- Results Area --- */
+/* 結果區域樣式 */
 .store-list {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 25px;
-    min-height: 300px; /* Avoid layout shift while loading */
+    min-height: 300px;
+    padding: 20px 0;
 }
 
-/* --- Store Item Card --- */
+/* 店家卡片樣式 */
 .store-item {
     width: 100%;
     height: 300px;

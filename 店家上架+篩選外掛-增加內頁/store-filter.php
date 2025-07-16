@@ -1,8 +1,9 @@
 <?php
 /*
 Plugin Name: Store Filter
-Version: 1.5
+Version: 1.6
 Author: Your Name
+Description: 店家上架與篩選外掛，包含店家列表與單一店家頁面功能
 */
 
 if (!defined('ABSPATH')) exit;
@@ -71,7 +72,14 @@ if (!function_exists('store_filter_register_taxonomy')) {
 // 3. Enqueue Frontend Scripts & Styles
 if (!function_exists('store_filter_enqueue_scripts')) {
     function store_filter_enqueue_scripts() {
+        // 載入篩選器樣式
         wp_enqueue_style('store-filter-style', plugin_dir_url(__FILE__) . 'assets/css/store-filter.css', array(), '1.2');
+        
+        // 載入單一店家頁面樣式
+        if (is_singular('store')) {
+            wp_enqueue_style('store-single-style', plugin_dir_url(__FILE__) . 'assets/css/store-single.css', array(), '1.0');
+        }
+        
         wp_enqueue_script('store-filter-script', plugin_dir_url(__FILE__) . 'assets/js/store-filter.js', array('jquery'), '1.2', true);
         wp_localize_script('store-filter-script', 'storeAjax', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
