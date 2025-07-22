@@ -50,6 +50,30 @@ acf_add_local_field_group(array(
             'toolbar' => 'full',
             'media_upload' => 1,
         ),
+        array(
+            'key' => 'field_facebook_url',
+            'label' => 'Facebook 網址',
+            'name' => 'facebook_url',
+            'type' => 'url',
+            'instructions' => '請輸入 Facebook 專頁或個人檔案的完整網址',
+            'placeholder' => 'https://www.facebook.com/yourpage',
+        ),
+        array(
+            'key' => 'field_instagram_url',
+            'label' => 'Instagram 網址',
+            'name' => 'instagram_url',
+            'type' => 'url',
+            'instructions' => '請輸入 Instagram 個人檔案的完整網址',
+            'placeholder' => 'https://www.instagram.com/yourusername',
+        ),
+        array(
+            'key' => 'field_line_url',
+            'label' => 'LINE 官方帳號網址',
+            'name' => 'line_url',
+            'type' => 'url',
+            'instructions' => '請輸入 LINE 官方帳號的網址',
+            'placeholder' => 'https://lin.ee/yourlineid',
+        ),
     ),
     'location' => array(
         array(

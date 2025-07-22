@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Store Filter
-Version: 1.5
+Version: 1.8
 Author: Your Name
 */
 
