@@ -39,12 +39,12 @@ if (!function_exists('clinic_filter_register_taxonomy')) {
         register_taxonomy('clinic_location', array('clinic'), array(
             'hierarchical' => true,
             'labels'       => array(
-                'name'         => '地區',
-                'singular_name'=> '地區',
-                'menu_name'    => '地區',
-                'all_items'    => '所有地區',
-                'parent_item'  => '上層地區',
-                'add_new_item' => '新增地區'
+                'name'         => '縣市',
+                'singular_name'=> '縣市',
+                'menu_name'    => '縣市',
+                'all_items'    => '所有縣市',
+                'parent_item'  => '上層縣市',
+                'add_new_item' => '新增縣市'
             ),
             'rewrite' => array('slug' => 'clinic-location')
         ));
@@ -99,10 +99,10 @@ if (!function_exists('clinic_search_bar_shortcode')) {
     <div class="clinic-filter-container">
         <form id="clinic-filter-form">
             <div class="clinic-filter-row">
-                <!-- 縣市 -->
+                <!-- 區域 -->
                 <div class="clinic-filter-field city">
                     <select id="clinic_city" name="clinic_city">
-                        <option value="">選擇縣市</option>
+                        <option value="">選擇區域</option>
                         <?php if ($cities && !is_wp_error($cities)) : ?>
                             <?php foreach($cities as $city) : ?>
                                 <option value="<?php echo esc_attr($city->term_id); ?>">
@@ -112,10 +112,10 @@ if (!function_exists('clinic_search_bar_shortcode')) {
                         <?php endif; ?>
                     </select>
                 </div>
-                <!-- 區域 -->
+                <!-- 縣市 -->
                 <div class="clinic-filter-field area">
                     <select id="clinic_area" name="clinic_area" disabled>
-                        <option value="">選擇區域</option>
+                        <option value="">選擇縣市</option>
                     </select>
                 </div>
                 <!-- 搜尋關鍵字 -->

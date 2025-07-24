@@ -19,10 +19,10 @@ jQuery(document).ready(function($){
         });
     }
 
-    // 縣市
+    // 區域
     $("#clinic_city").on("change", function(){
         var city_id = $(this).val() || "";
-        $("#clinic_area").html("<option value=''>選擇區域</option>").prop("disabled", true);
+        $("#clinic_area").html("<option value=''>選擇縣市</option>").prop("disabled", true);
 
         // 篩選
         filterClinics(city_id, "", $("#clinic_keyword").val());
@@ -50,7 +50,7 @@ jQuery(document).ready(function($){
         });
     });
 
-    // 區域
+    // 縣市
     $("#clinic_area").on("change", function(){
         filterClinics($("#clinic_city").val(), $(this).val(), $("#clinic_keyword").val());
     });
@@ -116,10 +116,10 @@ jQuery(document).ready(function($){
         });
     }
 
-    // 縣市
+    // 區域
     $("#clinic_city").on("change", function(){
         var city_id = $(this).val() || "";
-        $("#clinic_area").html("<option value=''>選擇區域</option>").prop("disabled", true);
+        $("#clinic_area").html("<option value=''>選擇縣市</option>").prop("disabled", true);
 
         filterClinics(city_id, "", $("#clinic_keyword").val());
 
@@ -147,7 +147,7 @@ jQuery(document).ready(function($){
         });
     });
 
-    // 區域
+    // 縣市
     $("#clinic_area").on("change", function(){
         filterClinics($("#clinic_city").val(), $(this).val(), $("#clinic_keyword").val());
     });
