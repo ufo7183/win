@@ -1,56 +1,156 @@
 /* =========== 全域容器 =========== */
-.myplugin-wrapper {
+.clinic-filter-wrapper {
     width: 100%;
     margin: 0 auto;
     box-sizing: border-box;
-    text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+    color: #212529;
 }
 
 /* 外層 .clinic-filter-container：上方篩選區塊 */
-.myplugin-wrapper .clinic-filter-container {
+.clinic-filter-wrapper .clinic-filter-container {
     margin-bottom: 30px;
-}
-
-/* 大螢幕 (>700px) */
-@media (min-width: 700px) {
-    .myplugin-wrapper .clinic-filter-row {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        width: 680px;
-        margin: 0 auto;
-    }
-}
-
-/* 小螢幕 (<=700px) */
-@media (max-width: 700px) {
-    .myplugin-wrapper .clinic-filter-row {
-        width: 100%;
-        margin: 0 auto;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        justify-content: center;
-    }
-}
-
-/* ========== 下拉選單樣式 ========== */
-.myplugin-wrapper .clinic-filter-field select {
-    display: block;
-    font-size: 16px;
-    line-height: 25.6px;
-    padding: 5px 35px 5px 10px;
-    border: none !important;
+    padding: 20px;
+    background-color: #f8f9fa;
     border-radius: 8px;
-    background-color: #fff;
-    box-sizing: border-box;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* 表單行間距與彈性布局 */
+.clinic-filter-container .row {
+    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
     width: 100%;
+    gap: 10px;
+}
+
+/* 表單項目彈性分配 */
+.clinic-filter-container .row > div {
+    flex: 1;
+    min-width: 150px;
+}
+
+/* 自定義按鈕樣式 */
+.btn-primary {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #0d6efd;
+    --bs-btn-border-color: #0d6efd;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #0b5ed7;
+    --bs-btn-hover-border-color: #0a58ca;
+    --bs-btn-focus-shadow-rgb: 49, 132, 253;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #0a58ca;
+    --bs-btn-active-border-color: #0a53be;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #0d6efd;
+    --bs-btn-disabled-border-color: #0d6efd;
+    font-weight: 500;
+    height: 38px;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-outline-secondary {
+    --bs-btn-color: #6c757d;
+    --bs-btn-border-color: #6c757d;
+    --bs-btn-hover-bg: #6c757d;
+    --bs-btn-hover-border-color: #6c757d;
+    --bs-btn-active-bg: #6c757d;
+    --bs-btn-active-border-color: #6c757d;
+}
+
+/* 表單元素通用樣式 */
+.form-select,
+.form-control {
+    height: 38px;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+    font-size: 14px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-select:focus,
+.form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-right: none;
+    color: #6c757d;
+}
+
+.input-group .form-control {
+    border-left: none;
+    padding-left: 0;
+    border-radius: 0 4px 4px 0;
+}
+
+/* 響應式調整 */
+@media (max-width: 767.98px) {
+    .clinic-filter-container .col-12 {
+        margin-bottom: 10px;
+    }
+    
+    .btn, .form-select, .form-control {
+        width: 100%;
+    }
+}
+
+/* 響應式調整 */
+@media (max-width: 767.98px) {
+    .s-clinic-filter > div {
+        margin-bottom: 10px;
+    }
+    
+    /* 手機版：全部診所按鈕和搜尋框各佔一行 */
+    .s-clinic-filter > .col-4,
+    .s-clinic-filter > .col-8 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    /* 手機版：地區和縣市各佔50%寬度 */
+    .s-clinic-filter > .col-6 {
+        flex: 0 0 48%;
+        max-width: 48%;
+    }
+}
+
+/* 平板和桌面版：所有元素排成一行 */
+@media (min-width: 768px) {
+    .s-clinic-filter {
+        flex-wrap: nowrap;
+    }
+    
+    .s-clinic-filter > div {
+        margin-bottom: 0;
+    }
+}
+
+/* 確保表單元素寬度正確 */
+.s-clinic-filter {
+    margin: 0 -0.25rem;
+}
+
+.s-clinic-filter > div {
+    padding: 0 0.25rem;
+}
+
+/* 移除 Bootstrap 預設的 form-select 箭頭陰影 */
+.form-select:focus {
+    box-shadow: none;
+    border-color: #ced4da;
 }
 
 /* 大螢幕 */
 @media (min-width: 700px) {
-    .myplugin-wrapper .city, .myplugin-wrapper .area {
+    .clinic-filter-wrapper .city, .clinic-filter-wrapper .area {
         width: 200px;
     }
 }
@@ -184,7 +284,7 @@
     background: #f9f9f9;
     border-radius: 4px;
 }
-.myplugin-wrapper .load-more {
+.clinic-filter-wrapper .load-more {
     display: block;
     margin: 20px auto;
     padding: 10px 30px;
