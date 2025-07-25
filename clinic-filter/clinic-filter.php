@@ -84,17 +84,17 @@ if (!function_exists('clinic_filter_register_post_type')) {
 // 2. 註冊「診所地區」taxonomy
 function clinic_filter_register_taxonomy_init() {
     $labels = array(
-        'name'              => '縣市',
-        'singular_name'     => '縣市',
-        'search_items'      => '搜尋縣市',
-        'all_items'         => '所有縣市',
-        'parent_item'       => '上層縣市',
-        'parent_item_colon' => '上層縣市:',
-        'edit_item'         => '編輯縣市',
-        'update_item'       => '更新縣市',
-        'add_new_item'      => '新增縣市',
-        'new_item_name'     => '新縣市名稱',
-        'menu_name'         => '縣市',
+        'name'              => '地區',
+        'singular_name'     => '地區',
+        'search_items'      => '搜尋地區',
+        'all_items'         => '所有地區',
+        'parent_item'       => '上層地區',
+        'parent_item_colon' => '上層地區:',
+        'edit_item'         => '編輯地區',
+        'update_item'       => '更新地區',
+        'add_new_item'      => '新增地區',
+        'new_item_name'     => '新地區名稱',
+        'menu_name'         => '地區',
     );
 
     $args = array(
@@ -218,37 +218,43 @@ if (!function_exists('clinic_list_shortcode')) {
 // 6. 產生列表 HTML
 if (!function_exists('clinic_filter_generate_list')) {
     function clinic_filter_generate_list($city_id = 0, $area_id = 0, $keyword = '', $offset = 0) {
+        // 參數驗證
+        $city_id = intval($city_id);
+        $area_id = intval($area_id);
+        $keyword = sanitize_text_field($keyword);
+        $offset  = max(0, intval($offset));
+        
+        // 準備查詢參數
         $args = array(
             'post_type'      => 'clinic',
-            'posts_per_page' => 25, // 每次載入 25 筆
+            'posts_per_page' => 25, // 每頁顯示 25 筆
             'offset'         => $offset,
-            'post_status'    => 'publish',
             'orderby'        => 'title',
             'order'          => 'ASC',
+            'post_status'    => 'publish'
         );
-
-        $tax_query = array();
         
-        if ($city_id > 0) {
-            $tax_query[] = array(
-                'taxonomy' => 'clinic_location',
-                'field'    => 'term_id',
-                'terms'    => $city_id,
-            );
-        }
-        
+        // 地區篩選
         if ($area_id > 0) {
-            $tax_query[] = array(
-                'taxonomy' => 'clinic_location',
-                'field'    => 'term_id',
-                'terms'    => $area_id,
+            $args['tax_query'] = array(
+                array(
+                    'taxonomy' => 'clinic_location',
+                    'field'    => 'term_id',
+                    'terms'    => $area_id
+                )
+            );
+        } elseif ($city_id > 0) {
+            $args['tax_query'] = array(
+                array(
+                    'taxonomy' => 'clinic_location',
+                    'field'    => 'term_id',
+                    'terms'    => $city_id,
+                    'include_children' => true
+                )
             );
         }
         
-        if (!empty($tax_query)) {
-            $args['tax_query'] = $tax_query;
-        }
-        
+        // 關鍵字搜尋
         if (!empty($keyword)) {
             $args['s'] = $keyword;
         }
@@ -261,87 +267,85 @@ if (!function_exists('clinic_filter_generate_list')) {
         
         ob_start();
         
-        if ($query->have_posts()) {
-            echo '<div class="clinic-list">';
-            while ($query->have_posts()) {
-                $query->the_post();
-                
-                // 獲取 ACF 欄位
-                $store_address = get_field('address', get_the_ID());
-                $store_phone = get_field('phone', get_the_ID());
-                $store_website = get_field('store_website', get_the_ID());
-                
-                // 獲取子分類
-                $categories = get_the_terms(get_the_ID(), 'clinic_location');
-                $category_name = '';
-                if ($categories && !is_wp_error($categories)) {
-                    $category_names = array();
-                    foreach ($categories as $category) {
-                        // 只顯示子分類（非頂層分類）
-                        if ($category->parent != 0) {
-                            $category_names[] = $category->name;
-                        }
+        echo '<div class="clinic-list">';
+        while ($query->have_posts()) {
+            $query->the_post();
+            
+            // 獲取 ACF 欄位
+            $address = get_field('address', get_the_ID());
+            $phone = get_field('phone', get_the_ID());
+            $store_website = get_field('store_website', get_the_ID());
+            
+            // 獲取子分類（使用 clinic_location 分類法）
+            $subcategories = array();
+            $locations = get_the_terms(get_the_ID(), 'clinic_location');
+            
+            if ($locations && !is_wp_error($locations)) {
+                foreach ($locations as $location) {
+                    // 只獲取子分類（有父級的分類）
+                    if ($location->parent != 0) {
+                        $subcategories[] = $location->name;
                     }
-                    $category_name = !empty($category_names) ? esc_html(implode(', ', $category_names)) : '-';
                 }
-                
-                // 如果沒有網址，則不添加連結
-                $list_item = sprintf(
-                    '<div class="clinic-item">
-                        <div class="clinic-category">%s</div>
-                        <div class="clinic-name">%s</div>
-                        <div class="clinic-address">%s</div>
-                        <div class="clinic-phone">%s</div>
-                    </div>',
-                    $category_name,
-                    esc_html(get_the_title()),
-                    $store_address ? esc_html($store_address) : '-',
-                    $store_phone ? esc_html($store_phone) : '-'
-                );
-                
-                // 如果有網址，則包裝在連結中
-                if ($store_website) {
-                    $list_item = sprintf(
-                        '<a href="%s" class="clinic-item-link" target="_blank" rel="noopener noreferrer">%s</a>',
-                        esc_url($store_website),
-                        $list_item
-                    );
-                }
-                
-                echo $list_item;
             }
-            echo '</div>';
+            $category_name = !empty($subcategories) ? $subcategories[0] : '';
             
-            // 載入更多按鈕
-            if (($offset + $query->post_count) < $total) {
-                echo '<div class="text-center mt-4">';
-                echo '<button id="load-more" class="btn btn-outline-primary" 
-                       data-city="' . esc_attr($city_id) . '" 
-                       data-area="' . esc_attr($area_id) . '" 
-                       data-keyword="' . esc_attr($keyword) . '" 
-                       data-offset="' . ($offset + $query->post_count) . '">
-                        載入更多
-                    </button>';
-                echo '</div>';
-            }
-            
-            wp_reset_postdata();
-            
-            if ($query->have_posts()) {
-                return array(
-                    'success' => true,
-                    'data' => ob_get_clean(),
-                    'has_more' => ($total > ($offset + 25)) // 更新為 25 筆判斷
-                );
-            } else {
-                $message = !empty($keyword) ? '搜尋不到此診所' : '此地區暫無認證診所';
-                return array(
-                    'success' => false,
-                    'data' => '<div class="alert alert-info">' . $message . '</div>',
-                    'has_more' => false
-                );
-            }
+            // 構建診所項目
+            ?>
+            <a href="<?php echo $store_website ? esc_url($store_website) : '#'; ?>" class="clinic-item-link" <?php echo $store_website ? 'target="_blank"' : ''; ?>>
+                <div class="clinic-item">
+                    <div class="clinic-left">
+                        <div class="clinic-name">
+                            <?php if ($category_name) : ?>
+                                <span class="s-item-city"><?php echo esc_html($category_name); ?></span>
+                            <?php endif; ?>
+                            <?php the_title(); ?>
+                        </div>
+                    </div>
+                    <div class="clinic-right">
+                        <div class="clinic-info">
+                            <?php if ($address) : ?>
+                                <div class="clinic-address"><?php echo esc_html($address); ?></div>
+                            <?php endif; ?>
+                            <?php if ($phone) : ?>
+                                <div class="clinic-phone"><?php echo esc_html($phone); ?></div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            <?php
         }
+        echo '</div>';
+        
+        // 載入更多按鈕
+        if (($offset + $query->post_count) < $total) {
+            echo '<div class="text-center mt-4">';
+            echo '<button id="load-more" class="btn btn-outline-primary" 
+                   data-city="' . esc_attr($city_id) . '" 
+                   data-area="' . esc_attr($area_id) . '" 
+                   data-keyword="' . esc_attr($keyword) . '" 
+                   data-offset="' . ($offset + $query->post_count) . '">
+                    載入更多
+                </button>';
+            echo '</div>';
+        }
+        
+        wp_reset_postdata();
+        
+        $has_posts = $query->post_count > 0;
+        $response = array(
+            'success' => $has_posts,
+            'data' => ob_get_clean(),
+            'has_more' => $has_posts ? ($total > ($offset + $query->post_count)) : false
+        );
+        
+        if (!$has_posts && $offset === 0) {
+            $message = !empty($keyword) ? '搜尋不到此診所' : '此地區暫無認證診所';
+            $response['data'] = '<div class="alert alert-info">' . $message . '</div>';
+        }
+        
+        return $response;
     }
 }
 

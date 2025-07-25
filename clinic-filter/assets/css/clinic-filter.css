@@ -1,4 +1,4 @@
-/* =========== 全域容器 =========== */
+/* =========== 全域樣式 =========== */
 .clinic-filter-wrapper {
     width: 100%;
     margin: 0 auto;
@@ -8,8 +8,8 @@
     color: #212529;
 }
 
-/* 外層 .clinic-filter-container：上方篩選區塊 */
-.clinic-filter-wrapper .clinic-filter-container {
+/* =========== 篩選表單 =========== */
+.clinic-filter-container {
     margin-bottom: 30px;
     padding: 20px;
     background-color: #f8f9fa;
@@ -17,298 +17,295 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* 表單行間距與彈性布局 */
+/* 表單行佈局 */
 .clinic-filter-container .row {
-    margin-bottom: 15px;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     width: 100%;
-    gap: 10px;
+   
+    margin-bottom: 15px;
+    align-items: center;
 }
 
-/* 表單項目彈性分配 */
+/* 表單項目 */
 .clinic-filter-container .row > div {
     flex: 1;
     min-width: 150px;
 }
 
-/* 自定義按鈕樣式 */
-.btn-primary {
-    --bs-btn-color: #fff;
-    --bs-btn-bg: #0d6efd;
-    --bs-btn-border-color: #0d6efd;
-    --bs-btn-hover-color: #fff;
-    --bs-btn-hover-bg: #0b5ed7;
-    --bs-btn-hover-border-color: #0a58ca;
-    --bs-btn-focus-shadow-rgb: 49, 132, 253;
-    --bs-btn-active-color: #fff;
-    --bs-btn-active-bg: #0a58ca;
-    --bs-btn-active-border-color: #0a53be;
-    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-    --bs-btn-disabled-color: #fff;
-    --bs-btn-disabled-bg: #0d6efd;
-    --bs-btn-disabled-border-color: #0d6efd;
-    font-weight: 500;
+/* 篩選表單網格佈局 */
+#clinic-filter-form {
+    display: grid;
+    grid-template-columns: 14% 34% 25% 25%;
+    grid-template-rows: 1fr;
+    column-gap: 8px;
+    width: 100%;
+}
+
+/* 重設篩選按鈕 */
+#reset-filters {
+    font-weight: 400;
+    color: #000;
+    background-color: #d3cabb;
+    font-size: 16px;
+    width: 100% !important;
     height: 38px;
-    transition: all 0.2s ease-in-out;
+    border: 1px solid #d3cabb;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
-.btn-outline-secondary {
-    --bs-btn-color: #6c757d;
-    --bs-btn-border-color: #6c757d;
-    --bs-btn-hover-bg: #6c757d;
-    --bs-btn-hover-border-color: #6c757d;
-    --bs-btn-active-bg: #6c757d;
-    --bs-btn-active-border-color: #6c757d;
+/* 搜尋欄位 */
+#clinic-keyword {
+    font-size: 16px;
+    width: 100% !important;
+    height: 38px;
+    padding: 6px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
 }
 
-/* 表單元素通用樣式 */
-.form-select,
-.form-control {
+/* 下拉選單 */
+.clinic-filter-container select {
     height: 38px;
     border-radius: 4px;
     border: 1px solid #ced4da;
-    font-size: 14px;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
-
-.form-select:focus,
-.form-control:focus {
-    border-color: #86b7fe;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-}
-
-.input-group-text {
-    background-color: #f8f9fa;
-    border: 1px solid #ced4da;
-    border-right: none;
-    color: #6c757d;
-}
-
-.input-group .form-control {
-    border-left: none;
-    padding-left: 0;
-    border-radius: 0 4px 4px 0;
-}
-
-/* 響應式調整 */
-@media (max-width: 767.98px) {
-    .clinic-filter-container .col-12 {
-        margin-bottom: 10px;
-    }
-    
-    .btn, .form-select, .form-control {
-        width: 100%;
-    }
-}
-
-/* 響應式調整 */
-@media (max-width: 767.98px) {
-    .s-clinic-filter > div {
-        margin-bottom: 10px;
-    }
-    
-    /* 手機版：全部診所按鈕和搜尋框各佔一行 */
-    .s-clinic-filter > .col-4,
-    .s-clinic-filter > .col-8 {
-        flex: 0 0 100%;
-        max-width: 100%;
-    }
-    
-    /* 手機版：地區和縣市各佔50%寬度 */
-    .s-clinic-filter > .col-6 {
-        flex: 0 0 48%;
-        max-width: 48%;
-    }
-}
-
-/* 平板和桌面版：所有元素排成一行 */
-@media (min-width: 768px) {
-    .s-clinic-filter {
-        flex-wrap: nowrap;
-    }
-    
-    .s-clinic-filter > div {
-        margin-bottom: 0;
-    }
-}
-
-/* 確保表單元素寬度正確 */
-.s-clinic-filter {
-    margin: 0 -0.25rem;
-}
-
-.s-clinic-filter > div {
-    padding: 0 0.25rem;
-}
-
-/* 移除 Bootstrap 預設的 form-select 箭頭陰影 */
-.form-select:focus {
-    box-shadow: none;
-    border-color: #ced4da;
-}
-
-/* 大螢幕 */
-@media (min-width: 700px) {
-    .clinic-filter-wrapper .city, .clinic-filter-wrapper .area {
-        width: 200px;
-    }
-}
-
-/* 小螢幕 */
-@media (max-width: 700px) {
-    .myplugin-wrapper .city, .myplugin-wrapper .area {
-        width: calc(50% - 10px);
-    }
-}
-
-/* ========== 搜尋區塊(搜尋欄+按鈕) ========== */
-.myplugin-wrapper .search-box {
-    width: 100%;
-}
-@media (min-width: 700px) {
-    .myplugin-wrapper .search-box {
-        flex: 1;
-        max-width: 400px;
-    }
-}
-
-/* 膠囊 */
-.myplugin-wrapper .ser-box {
-    display: inline-flex;
-    align-items: center;
-    width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 40px;
-    overflow: hidden;
-    background: #fff;
-    box-sizing: border-box;
-}
-
-/* 放大鏡圖示 */
-.myplugin-wrapper .search-icon {
-    font-size: 18px;
-    color: #666;
-    margin-left: 10px;
-    margin-right: 8px;
-}
-
-/* 搜尋輸入 */
-.myplugin-wrapper .ser-box input[type="text"] {
-    border: none;
-    outline: none;
-    flex: 1;
     font-size: 16px;
-    line-height: 25.6px;
-    background: transparent;
-    padding: 5px 10px;
-}
-
-/* 按鈕 */
-.myplugin-wrapper .ser-box .button {
-    background: #033473;
-    color: #fff;
-    border: none;
-    padding: 8px 25px;
-    font-size: 18px;
-    line-height: 28.8px;
-    border-radius: 40px;
-    cursor: pointer;
-    white-space: nowrap;
-    z-index: 10;
-}
-
-/* =========== 列表區 =========== */
-.myplugin-wrapper .clinic-list-container {
+    padding: 6px 12px;
     width: 100%;
-    max-width: 1200px;
-    margin: 30px auto 0;
-    text-align: left;
 }
 
-/* 列表內容 */
-.clinic-list {
-    margin: 30px 0;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    overflow: hidden;
+/* 診所列表容器 */
+#clinic-list-container .clinic-list {
+    margin-top: 12px;
 }
 
-/* 單一診所項目 */
-.clinic-item-link {
-    display: block;
-    text-decoration: none;
-    color: #333;
-    transition: background-color 0.2s;
-    border-bottom: 1px solid #eee;
+.clinic-filter-container{
+	padding-bottom:0px;
+	padding-top:0px;
+	padding-right:0px;
+	padding-left:0px;
+	background-color:#FFFFFF00;
+	
 }
 
-.clinic-item-link:hover {
-    background-color: #f9f9f9;
-}
-
+/* =========== 診所項目 =========== */
 .clinic-item {
     display: flex;
     align-items: center;
     padding: 15px;
+    position: relative;
+    border-bottom: 1px solid #000;
+    
 }
 
-/* 各欄位樣式 */
-.clinic-category,
-.clinic-name,
+.clinic-item:hover {
+    background-color: #f2efea;
+}
+
+/* 子分類標籤 */
+.s-item-city {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+    text-align: center;
+    white-space: nowrap;
+    line-height: 1.2;
+    font-family: var(--s-font-title, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+    font-size: 0.85rem;
+    color: #fff;
+    background-color: #d3cabb;
+    border-radius: 0.2rem;
+}
+
+/* 診所資訊 */
+.clinic-info {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+}
+
+/* 左側區塊 */
+.clinic-left {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+/* 右側區塊 */
+.clinic-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* 地址和電話 */
 .clinic-address,
 .clinic-phone {
-    padding: 0 10px;
-    box-sizing: border-box;
-    word-break: break-word;
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
 }
 
-.clinic-category {
-    width: 15%;
-    color: #666;
+/* 連結樣式 */
+.clinic-item-link {
+    display: block;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.2s ease;
 }
 
-.clinic-name {
-    width: 25%;
-    font-weight: 500;
-}
-
-.clinic-address {
-    width: 45%;
-    color: #555;
-}
-
-.clinic-phone {
-    width: 15%;
-    text-align: right;
-    color: #0d6efd;
-}
-
-/* 響應式設計 */
-@media (max-width: 992px) {
-    .clinic-category {
-        width: 20%;
+/* =========== 響應式設計 =========== */
+/* 平板和較小桌面 */
+@media (max-width: 1023.98px) {
+    #clinic-filter-form {
+        grid-template-rows: 1fr 1fr;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
     }
     
-    .clinic-name {
-        width: 30%;
+    .clinic-filter-container .row {
+        flex-wrap: wrap;
+        gap: 15px;
     }
     
-    .clinic-address {
-        width: 35%;
+    .clinic-filter-container .btn-all-clinics,
+    .clinic-filter-container .search-box,
+    .clinic-filter-container .area-selector,
+    .clinic-filter-container .city-selector {
+        flex: 1 1 100% !important;
+        max-width: 100%;
+        min-width: 100%;
+        margin-bottom: 10px;
     }
     
-    .clinic-phone {
-        width: 15%;
+    .clinic-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
     }
 }
 
-@media (max-width: 768px) {
-    
+/* 手機版 */
+@media (max-width: 767.98px) {
     .clinic-item {
         flex-wrap: wrap;
         padding: 15px 10px;
-        position: relative;
+    }
+    
+    .clinic-info {
+        flex-direction: row;
+        margin-top: 10px;
+        padding-left: 55px;
+        width: 100%;
+    }
+    
+    .clinic-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+/* 右側區塊 */
+.clinic-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 1;
+}
+
+/* 類別樣式 */
+.clinic-category {
+    position: relative;
+    margin-right: 15px;
+}
+
+.clinic-category span {
+    display: inline-block;
+    padding: 0.3rem;
+    vertical-align: baseline;
+    text-align: center;
+    white-space: nowrap;
+    line-height: 1;
+    font-family: var(--s-font-title, inherit);
+    font-size: 0.9rem;
+    color: rgba(var(--bs-white-rgb), 1);
+    background-color: rgba(var(--bs-primary-rgb), 1);
+    border-radius: 0.2rem;
+}
+
+/* 診所名稱樣式 */
+.clinic-name {
+    font-family: var(--s-font-title, inherit);
+    letter-spacing: var(--s-font-title-spacing, normal);
+    font-size: 1.2rem;
+    color: rgba(var(--bs-black-rgb), 1);
+    margin-right: 20px;
+}
+
+/* 地址和電話容器 */
+.clinic-info {
+    display: flex;
+    align-items: center;
+}
+
+/* 地址和電話共用樣式 */
+.clinic-address,
+.clinic-phone {
+    position: relative;
+    margin-left: 0.75rem;
+    font-size: 1rem;
+    line-height: 1.25;
+    opacity: 1;
+    display: inline-block;
+}
+
+/* 響應式設計 */
+/* 1439px 以下裝置 */
+@media (max-width: 1439px) {
+    .clinic-list .clinic-item-link .clinic-item {
+        border-bottom-color: #000;
+    }
+}
+
+/* 平板和手機版 */
+@media (max-width: 768px) {
+    .clinic-item {
+        flex-wrap: wrap;
+        padding: 15px 10px;
+    }
+    
+    /* 767px 以下裝置 */
+    @media (max-width: 767px) {
+        /* 診所資訊 */
+        .clinic-list .clinic-item .clinic-info {
+            flex-direction: row;
+        }
+        
+        /* 右側資訊區塊 */
+        .clinic-list .clinic-item .clinic-right {
+            border-top-width: 0;
+            justify-content: flex-start;
+            padding-left: 55px;
+            display: block;
+            width: 100%;
+        }
+    }
+    
+    .clinic-left,
+    .clinic-right {
+        width: 100%;
+        flex: none;
+    }
+    
+    .clinic-right {
+        margin-top: 10px;
+        padding-top: 10px;
+        
     }
     
     .clinic-category,
@@ -316,82 +313,33 @@
     .clinic-address,
     .clinic-phone {
         width: 100% !important;
-        padding: 5px 0;
-        position: relative;
-        padding-left: 30%;
+        padding: 3px 0;
+        margin: 0;
+        text-align: left;
     }
     
-    .clinic-category::before,
-    .clinic-name::before,
-    .clinic-address::before,
-    .clinic-phone::before {
-        position: absolute;
-        left: 0;
-        font-weight: 600;
-        color: #666;
+    .clinic-category {
+        margin-bottom: 5px;
     }
     
-    .clinic-category::before { content: '類別: '; }
-    .clinic-name::before { content: '診所: '; }
-    .clinic-address::before { content: '地址: '; }
-    .clinic-phone::before { content: '電話: '; }
+    .clinic-address::after {
+        display: none;
+    }
+    
+    .clinic-phone {
+        margin-left: 0;
+    }
+    
+    .clinic-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .clinic-address,
+    .clinic-phone {
+        margin-left: 0;
+    }
+    
+   
 }
 
-.myplugin-wrapper .clinic-initial-message {
-    color: #033473;
-    font-size: 20px;
-    padding: 20px;
-    text-align: center;
-}
-
-.myplugin-wrapper .clinic-title {
-    flex: 0 0 40%;
-    font-size: 18px;
-    line-height: 28.8px;
-    transition: color 0.3s;
-    margin-bottom:0;
-}
-.myplugin-wrapper .clinic-title a {
-    color: #333;
-    text-decoration: none;
-}
-.myplugin-wrapper .clinic-title a:hover {
-    color: #1D6579;
-}
-.myplugin-wrapper .clinic-address {
-    flex: 0 0 40%;
-    font-size: 18px;
-    line-height: 28.8px;
-}
-.myplugin-wrapper .clinic-address a {
-    color: #2b6cb0;
-}
-.myplugin-wrapper .clinic-phone a {
-    color: #2b6cb0;
-}
-.myplugin-wrapper .clinic-phone {
-    flex: 0 0 20%;
-    font-size: 18px;
-    line-height: 28.8px;
-}
-.myplugin-wrapper .no-results {
-    padding: 30px;
-    text-align: center;
-    font-size: 18px;
-    background: #f9f9f9;
-    border-radius: 4px;
-}
-.clinic-filter-wrapper .load-more {
-    display: block;
-    margin: 20px auto;
-    padding: 10px 30px;
-    background: #033473;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-}
-.myplugin-wrapper .load-more.hidden {
-    display: none;
-}
