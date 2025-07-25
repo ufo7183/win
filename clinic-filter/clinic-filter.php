@@ -29,6 +29,54 @@ if (!function_exists('clinic_filter_register_post_type')) {
             'rewrite'     => array('slug' => 'clinic'),
             'supports'    => array('title','editor','thumbnail'),
         ));
+
+        // 註冊 ACF 欄位
+        if (function_exists('acf_add_local_field_group')) {
+            acf_add_local_field_group(array(
+                'key' => 'group_clinic_details',
+                'title' => '診所詳細資料',
+                'fields' => array(
+                    array(
+                        'key' => 'field_address',
+                        'label' => '地址',
+                        'name' => 'address',
+                        'type' => 'text',
+                        'instructions' => '請輸入診所完整地址',
+                        'required' => 1,
+                    ),
+                    array(
+                        'key' => 'field_phone',
+                        'label' => '電話',
+                        'name' => 'phone',
+                        'type' => 'text',
+                        'instructions' => '請輸入診所電話',
+                        'required' => 1,
+                    ),
+                    array(
+                        'key' => 'field_store_website',
+                        'label' => '店家網址',
+                        'name' => 'store_website',
+                        'type' => 'url',
+                        'instructions' => '請輸入完整的網址（包含 http:// 或 https://）',
+                        'required' => 0,
+                    ),
+                ),
+                'location' => array(
+                    array(
+                        array(
+                            'param' => 'post_type',
+                            'operator' => '==',
+                            'value' => 'clinic',
+                        ),
+                    ),
+                ),
+                'menu_order' => 0,
+                'position' => 'normal',
+                'style' => 'default',
+                'label_placement' => 'top',
+                'instruction_placement' => 'label',
+            ));
+        }
     }
     add_action('init', 'clinic_filter_register_post_type');
 }
@@ -214,39 +262,53 @@ if (!function_exists('clinic_filter_generate_list')) {
         ob_start();
         
         if ($query->have_posts()) {
-            echo '<div class="row">';
+            echo '<div class="clinic-list">';
             while ($query->have_posts()) {
                 $query->the_post();
-                ?>
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card h-100">
-                        <?php if (has_post_thumbnail()) : ?>
-                            <img src="<?php the_post_thumbnail_url('medium'); ?>" class="card-img-top" alt="<?php the_title(); ?>">
-                        <?php endif; ?>
-                        <div class="card-body">
-                            <h5 class="card-title"><?php the_title(); ?></h5>
-                            <div class="card-text">
-                                <?php 
-                                $location = get_the_terms(get_the_ID(), 'clinic_location');
-                                if ($location && !is_wp_error($location)) {
-                                    echo '<p><i class="fas fa-map-marker-alt"></i> ';
-                                    $location_names = array();
-                                    foreach ($location as $loc) {
-                                        $location_names[] = $loc->name;
-                                    }
-                                    echo esc_html(implode(', ', $location_names));
-                                    echo '</p>';
-                                }
-                                ?>
-                                <?php the_excerpt(); ?>
-                            </div>
-                        </div>
-                        <div class="card-footer bg-transparent">
-                            <a href="<?php the_permalink(); ?>" class="btn btn-primary">查看詳情</a>
-                        </div>
-                    </div>
-                </div>
-                <?php
+                
+                // 獲取 ACF 欄位
+                $store_address = get_field('address', get_the_ID());
+                $store_phone = get_field('phone', get_the_ID());
+                $store_website = get_field('store_website', get_the_ID());
+                
+                // 獲取子分類
+                $categories = get_the_terms(get_the_ID(), 'clinic_location');
+                $category_name = '';
+                if ($categories && !is_wp_error($categories)) {
+                    $category_names = array();
+                    foreach ($categories as $category) {
+                        // 只顯示子分類（非頂層分類）
+                        if ($category->parent != 0) {
+                            $category_names[] = $category->name;
+                        }
+                    }
+                    $category_name = !empty($category_names) ? esc_html(implode(', ', $category_names)) : '-';
+                }
+                
+                // 如果沒有網址，則不添加連結
+                $list_item = sprintf(
+                    '<div class="clinic-item">
+                        <div class="clinic-category">%s</div>
+                        <div class="clinic-name">%s</div>
+                        <div class="clinic-address">%s</div>
+                        <div class="clinic-phone">%s</div>
+                    </div>',
+                    $category_name,
+                    esc_html(get_the_title()),
+                    $store_address ? esc_html($store_address) : '-',
+                    $store_phone ? esc_html($store_phone) : '-'
+                );
+                
+                // 如果有網址，則包裝在連結中
+                if ($store_website) {
+                    $list_item = sprintf(
+                        '<a href="%s" class="clinic-item-link" target="_blank" rel="noopener noreferrer">%s</a>',
+                        esc_url($store_website),
+                        $list_item
+                    );
+                }
+                
+                echo $list_item;
             }
             echo '</div>';
             
