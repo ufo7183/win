@@ -27,7 +27,7 @@ if (!function_exists('clinic_filter_register_post_type')) {
             'public'      => true,
             'has_archive' => true,
             'rewrite'     => array('slug' => 'clinic'),
-            'supports'    => array('title','editor','thumbnail'),
+            'supports'    => array('title','thumbnail'),
         ));
 
         // 註冊 ACF 欄位
@@ -50,7 +50,7 @@ if (!function_exists('clinic_filter_register_post_type')) {
                         'name' => 'phone',
                         'type' => 'text',
                         'instructions' => '請輸入診所電話',
-                        'required' => 1,
+                        'required' => 0,
                     ),
                     array(
                         'key' => 'field_store_website',
@@ -71,7 +71,7 @@ if (!function_exists('clinic_filter_register_post_type')) {
                     ),
                 ),
                 'menu_order' => 0,
-                'position' => 'normal',
+                'position' => 'acf_after_title',  // 將自訂欄位置於標題下方
                 'style' => 'default',
                 'label_placement' => 'top',
                 'instruction_placement' => 'label',
@@ -110,7 +110,19 @@ function clinic_filter_register_taxonomy_init() {
 }
 add_action('init', 'clinic_filter_register_taxonomy_init', 0);
 
-// 3. 前端樣式 & JS
+// 3. 隱藏預設編輯器
+add_action('admin_init', function() {
+    remove_post_type_support('clinic', 'editor');
+    remove_post_type_support('clinic', 'excerpt');
+    remove_post_type_support('clinic', 'comments');
+    remove_post_type_support('clinic', 'trackbacks');
+    remove_post_type_support('clinic', 'custom-fields');
+    remove_post_type_support('clinic', 'revisions');
+    remove_post_type_support('clinic', 'page-attributes');
+    remove_post_type_support('clinic', 'post-formats');
+});
+
+// 4. 前端樣式 & JS
 if (!function_exists('clinic_filter_enqueue_scripts')) {
     function clinic_filter_enqueue_scripts() {
         // 載入 jQuery
@@ -161,24 +173,72 @@ if (!function_exists('clinic_search_bar_shortcode')) {
                 </div>
                 <div class="col-12 col-md-3">
                     <?php
-                    $cities = get_terms(array(
+                    // 獲取所有頂層分類（地區）
+                    $regions = get_terms(array(
                         'taxonomy'   => 'clinic_location',
                         'hide_empty' => false,
-                        'parent'     => 0
+                        'parent'     => 0,
+                        'orderby'    => 'name',
+                        'order'      => 'ASC'
                     ));
                     ?>
-                    <select class="form-select" id="clinic-city">
+                    <select class="form-select" id="clinic-region">
                         <option value="">選擇地區</option>
-                        <?php foreach ($cities as $city) : ?>
-                            <option value="<?php echo esc_attr($city->term_id); ?>">
-                                <?php echo esc_html($city->name); ?>
+                        <?php foreach ($regions as $region) : ?>
+                            <option value="<?php echo esc_attr($region->term_id); ?>">
+                                <?php echo esc_html($region->name); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="col-12 col-md-3">
-                    <select class="form-select" id="clinic-district" disabled>
+                    <?php
+                    // 1. 先獲取所有頂層分類
+                    $parent_terms = get_terms(array(
+                        'taxonomy' => 'clinic_location',
+                        'parent' => 0,
+                        'hide_empty' => false
+                    ));
+
+                    // 2. 收集所有子分類 ID
+                    $child_ids = [];
+                    if (!is_wp_error($parent_terms) && !empty($parent_terms)) {
+                        foreach ($parent_terms as $parent) {
+                            $children = get_terms(array(
+                                'taxonomy' => 'clinic_location',
+                                'parent' => $parent->term_id,
+                                'hide_empty' => false
+                            ));
+                            
+                            if (!is_wp_error($children) && !empty($children)) {
+                                foreach ($children as $child) {
+                                    $child_ids[] = $child->term_id;
+                                }
+                            }
+                        }
+                    }
+
+                    // 3. 獲取所有子分類
+                    $cities = [];
+                    if (!empty($child_ids)) {
+                        $cities = get_terms(array(
+                            'taxonomy' => 'clinic_location',
+                            'include' => $child_ids,
+                            'orderby' => 'name',
+                            'order' => 'ASC',
+                            'hide_empty' => false
+                        ));
+                    }
+                    ?>
+                    <select class="form-select" id="clinic-city">
                         <option value="">選擇縣市</option>
+                        <?php if (!is_wp_error($cities) && !empty($cities)) : ?>
+                            <?php foreach ($cities as $city) : ?>
+                                <option value="<?php echo esc_attr($city->term_id); ?>">
+                                    <?php echo esc_html($city->name); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </select>
                 </div>
             </form>
@@ -349,36 +409,83 @@ if (!function_exists('clinic_filter_generate_list')) {
     }
 }
 
-// 7. AJAX：取得子區域
 if (!function_exists('clinic_filter_get_districts_ajax')) {
     function clinic_filter_get_districts_ajax() {
-        check_ajax_referer('clinic_filter_nonce', 'nonce');
-        
-        $city_id = isset($_POST['city_id']) ? intval($_POST['city_id']) : 0;
-        
-        if ($city_id <= 0) {
-            wp_send_json_error('無效的城市 ID');
+        // 驗證 nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'clinic_filter_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
         }
+
+        // 獲取參數
+        $region_id = isset($_POST['city_id']) ? sanitize_text_field($_POST['city_id']) : '';
         
-        $districts = get_terms(array(
+        // 準備查詢參數
+        $args = array(
             'taxonomy'   => 'clinic_location',
             'hide_empty' => false,
-            'parent'     => $city_id
-        ));
+            'orderby'    => 'name',
+            'order'      => 'ASC'
+        );
         
-        if (is_wp_error($districts)) {
-            wp_send_json_error($districts->get_error_message());
+        if ($region_id === 'all') {
+            // 1. 先獲取所有頂層分類
+            $parent_terms = get_terms(array(
+                'taxonomy' => 'clinic_location',
+                'parent' => 0,
+                'hide_empty' => false
+            ));
+
+            // 2. 收集所有子分類 ID
+            $child_ids = [];
+            if (!is_wp_error($parent_terms) && !empty($parent_terms)) {
+                foreach ($parent_terms as $parent) {
+                    $children = get_terms(array(
+                        'taxonomy' => 'clinic_location',
+                        'parent' => $parent->term_id,
+                        'hide_empty' => false
+                    ));
+                    
+                    if (!is_wp_error($children) && !empty($children)) {
+                        foreach ($children as $child) {
+                            $child_ids[] = $child->term_id;
+                        }
+                    }
+                }
+            }
+
+            // 3. 獲取所有子分類
+            if (!empty($child_ids)) {
+                $args['include'] = $child_ids;
+            } else {
+                wp_send_json_success('');
+                return;
+            }
+        } else if (is_numeric($region_id) && $region_id > 0) {
+            // 獲取特定地區下的縣市
+            $args['parent'] = intval($region_id);
+        } else {
+            // 如果沒有提供有效的 region_id，返回空結果
+            wp_send_json_success('');
+            return;
         }
         
-        $options = '<option value="">選擇縣市</option>';
-        foreach ($districts as $district) {
-            $options .= sprintf(
-                '<option value="%s">%s</option>',
-                esc_attr($district->term_id),
-                esc_html($district->name)
-            );
+        // 獲取縣市列表
+        $cities = get_terms($args);
+        
+        // 生成選項 HTML
+        $options = '';
+        if (!is_wp_error($cities) && !empty($cities)) {
+            foreach ($cities as $city) {
+                $options .= sprintf(
+                    '<option value="%s">%s</option>',
+                    esc_attr($city->term_id),
+                    esc_html($city->name)
+                );
+            }
         }
         
+        // 返回 JSON 響應
         wp_send_json_success($options);
     }
     add_action('wp_ajax_clinic_filter_get_districts', 'clinic_filter_get_districts_ajax');
