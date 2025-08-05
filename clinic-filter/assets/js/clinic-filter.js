@@ -1,8 +1,20 @@
 jQuery(document).ready(function($) {
     var isLoading = false;
-    var currentOffset = 0;
-    var postsPerPage = 25; // 每次載入 25 筆
     var searchTimer = null;
+    var currentPage = 1;
+    
+    // 防止表單提交
+    $('form.clinic-search-form').on('submit', function(e) {
+        e.preventDefault();
+        
+        // 獲取篩選條件
+        const regionId = $("#clinic-region").val() || '';
+        const cityId = $("#clinic-city").val() || '';
+        const keyword = $("#clinic-keyword").val().trim();
+        
+        // 觸發篩選
+        filterClinics(cityId, regionId, keyword, 1);
+    });
 
     // 載入指定地區的縣市
     function loadCitiesByRegion(regionId = '') {
@@ -77,14 +89,25 @@ jQuery(document).ready(function($) {
     }
 
     // 篩選診所函數
-    function filterClinics(city_id, area_id, keyword, append = false) {
-        if (isLoading) return;
-        isLoading = true;
+    function filterClinics(city_id, area_id, keyword, page = 1, isInitialLoad = false) {
+        if (isLoading) {
+            console.log('篩選進行中，請稍候...');
+            return;
+        }
         
-        // 確保 city_id 和 area_id 是數字或空字串
+        // 更新載入狀態
+        isLoading = true;
+        console.log('開始篩選 - 城市:', city_id, '地區:', area_id, '關鍵字:', keyword, '頁碼:', page);
+        
+        // 確保參數正確
         city_id = city_id || '';
         area_id = area_id || '';
         keyword = keyword || '';
+        
+        // 如果不是初始載入，顯示載入動畫
+        if (!isInitialLoad) {
+            $("#clinic-list-container").html('<div class="text-center my-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">載入中...</span></div></div>');
+        }
         
         $.ajax({
             url: clinicAjax.ajaxurl,
@@ -94,88 +117,99 @@ jQuery(document).ready(function($) {
                 city_id: city_id,
                 area_id: area_id,
                 keyword: keyword,
-                offset: append ? currentOffset : 0,
+                paged: page,
                 nonce: clinicAjax.nonce
             },
             success: function(response) {
-                if (response.success) {
-                    if (response.data && response.data.data) {
-                        if (append) {
-                            $("#clinic-list-container .row").append(response.data.data);
-                            currentOffset += postsPerPage;
-                        } else {
-                            $("#clinic-list-container").html(response.data.data);
-                            currentOffset = postsPerPage;
-                        }
-                        // 更新載入更多按鈕狀態
-                        updateLoadMoreButton(response.data.has_more);
+                console.log('AJAX Response:', response); // 調試用
+                
+                if (response.success && response.data) {
+                    // 更新列表內容
+                    $("#clinic-list-container").html(response.data.data || response.data);
+                    
+                    // 更新分頁
+                    if (response.data.pagination) {
+                        $(".pagination-container").html(response.data.pagination);
+                    } else if (response.pagination) {
+                        $(".pagination-container").html(response.pagination);
                     } else {
-                        $("#clinic-list-container").html('<div class="alert alert-info">此地區暫無認證診所</div>');
-                        $("#load-more").hide();
+                        $(".pagination-container").empty();
                     }
+                    
+                    // 更新當前頁面
+                    currentPage = response.data.current_page || parseInt(page);
+                    
+                    // 滾動到列表頂部
+                    $('html, body').animate({
+                        scrollTop: $("#clinic-list-container").offset().top - 100
+                    }, 500);
                 } else {
-                    console.error('伺服器回應錯誤:', response);
-                    $("#clinic-list-container").html('<div class="alert alert-info">搜尋不到此診所</div>');
-                    $("#load-more").hide();
+                    console.error('伺服器回應錯誤或無數據:', response);
+                    $("#clinic-list-container").html('<div class="alert alert-info">' + (response.data || '搜尋不到此診所') + '</div>');
+                    $(".pagination-container").empty();
                 }
             },
             error: function(xhr, status, error) {
                 console.error("AJAX Error:", status, error);
-                $("#clinic-list-container").html('<div class="alert alert-info">搜尋不到此診所</div>');
-                $("#load-more").hide();
+                $("#clinic-list-container").html('<div class="alert alert-danger">載入失敗，請稍後再試</div>');
+                $(".pagination-container").empty();
             },
             complete: function() {
+                // 確保無論成功或失敗都會重置載入狀態
                 isLoading = false;
+                console.log('篩選完成，重置載入狀態');
             }
         });
     }
 
-    // 更新載入更多按鈕狀態
-    function updateLoadMoreButton(hasMore) {
-        if (hasMore) {
-            $("#load-more").show();
-        } else {
-            $("#load-more").hide();
-        }
-    }
+    // 分頁點擊事件
+    $(document).on("click", ".page-numbers:not(.current)", function(e) {
+        e.preventDefault();
+        if (isLoading) return;
+        
+        const page = $(this).data('page');
+        if (!page) return;
+        
+        const regionId = $("#clinic-region").val() || '';
+        const cityId = $("#clinic-city").val() || '';
+        const keyword = $("#clinic-keyword").val().trim();
+        
+        filterClinics(cityId, regionId, keyword, page);
+    });
 
     // 全部診所按鈕點擊事件
     $(document).on("click", "#reset-filters", function(e) {
         e.preventDefault();
         $("#clinic-region, #clinic-city").val('');
+        $("#clinic-keyword").val('');
         loadAllCities();
-        filterClinics('', '', '');
-    });
-
-    // 載入更多按鈕點擊事件
-    $(document).on("click", "#load-more", function() {
-        const regionId = $("#clinic-region").val() || '';
-        const cityId = $("#clinic-city").val() || '';
-        const keyword = $("#clinic-keyword").val().trim();
-        filterClinics(cityId, regionId, keyword, true);
+        // 重新載入頁面以顯示所有診所
+        window.location.href = window.location.pathname;
     });
 
     // 地區變更事件
-    $("#clinic-region").on("change", function() {
+    $(document).on("change", "#clinic-region", function() {
         const regionId = $(this).val() || '';
-        const cityId = $("#clinic-city").val() || '';
         const keyword = $("#clinic-keyword").val().trim();
         
         // 載入該地區的縣市
         loadCitiesByRegion(regionId);
         
-        // 觸發篩選
-        currentOffset = 0;
-        filterClinics('', regionId, keyword);
+        // 重置縣市選擇
+        $("#clinic-city").html('<option value="">選擇縣市</option>');
+        
+        // 觸發篩選（重置到第一頁）
+        filterClinics('', regionId, keyword, 1);
     });
     
     // 縣市變更時觸發搜尋
-    $("#clinic-city").on("change", function() {
+    $(document).on("change", "#clinic-city", function() {
         const regionId = $("#clinic-region").val() || '';
         const cityId = $(this).val() || '';
         const keyword = $("#clinic-keyword").val().trim();
-        currentOffset = 0;
-        filterClinics(cityId, regionId, keyword);
+        
+        console.log('City changed:', {cityId, regionId, keyword}); // 調試用
+        filterClinics(cityId, regionId, keyword, 1);
     });
     
     // 即時搜尋功能
@@ -185,16 +219,18 @@ jQuery(document).ready(function($) {
             clearTimeout(searchTimer);
         }
         
-        // 設置新的計時器，延遲 300 毫秒後執行搜尋
+        // 設置新的計時器，延遲 500 毫秒後執行搜尋（避免頻繁觸發）
         searchTimer = setTimeout(function() {
             const regionId = $("#clinic-region").val() || '';
             const cityId = $("#clinic-city").val() || '';
             const keyword = $("#clinic-keyword").val().trim();
-            currentOffset = 0;
-            filterClinics(cityId, regionId, keyword);
+            filterClinics(cityId, regionId, keyword, 1);
         }, 300);
     });
     
-    // 初始載入時顯示所有縣市
+    // 初始載入時只載入城市選單，不觸發篩選
     loadAllCities();
+    
+    // 移除自動觸發篩選的代碼
+    // 初始內容已經由 PHP 生成，不需要再通過 AJAX 載入
 });
